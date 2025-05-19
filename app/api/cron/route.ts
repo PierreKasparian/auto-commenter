@@ -43,7 +43,7 @@ export async function GET(req: Request) {
     });
 
   console.log(accounts);
-  for (let account of accounts) {
+  for (const account of accounts) {
     const randomHour = Math.floor(Math.random() * 11) + 8; // 8 to 18
     const randomMinute = Math.floor(Math.random() * 12) * 5; // 0, 5, 10, 15, ..., 55
     const today = new Date();
