@@ -7,7 +7,9 @@ import { NextResponse } from "next/server";
 //   process.env.SUPABASE_ANON_KEY!
 // );
 
-export async function GET() {
+export async function POST(req: Request) {
+  const body = await req.json();
+  console.log(body);
   // console.log(process.env.N8N_AUTH)
   // if (
   //   req.headers.get("Authorization") !== `Bearer ${process.env.TRIG_TASK_KEY}`
