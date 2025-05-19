@@ -1,0 +1,8 @@
+{
+    "functions": {
+      "api/cron.ts": {
+        "schedule": "* * * * *"
+      }
+    }
+  }
+  
