@@ -1,0 +1,88 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { Plus, X } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Badge } from "@/components/ui/badge"
+import { saveKeywords } from "@/utils/supabase/queries"
+
+export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: string[]}) {
+  const [keywords, setKeywords] = useState<string[]>(kw)
+  const [newKeyword, setNewKeyword] = useState("")
+
+  const addKeyword = async () => {
+    if (newKeyword.trim() && !keywords.includes(newKeyword.trim())) {
+      setKeywords([...keywords, newKeyword.trim()])
+      setNewKeyword("")
+    }
+  }
+
+  const removeKeyword = (keywordToRemove: string) => {
+    setKeywords(keywords.filter((keyword) => keyword !== keywordToRemove))
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault()
+      addKeyword()
+    }
+  }
+
+
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>LinkedIn Keyword Automation</CardTitle>
+        <CardDescription>Choose keywords that trigger automatic comments on LinkedIn posts</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex space-x-2">
+          <Input
+            placeholder="Add a keyword..."
+            value={newKeyword}
+            onChange={(e) => setNewKeyword(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="flex-1"
+          />
+          <Button size="sm" onClick={addKeyword} disabled={!newKeyword.trim()}>
+            <Plus className="h-4 w-4 mr-1" /> Add
+          </Button>
+        </div>
+
+        <div className="min-h-20 p-3 border rounded-md bg-muted/40">
+          {keywords.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {keywords.map((keyword) => (
+                <Badge key={keyword} variant="secondary" className="px-2 py-1">
+                  {keyword}
+                  <button
+                    onClick={() => removeKeyword(keyword)}
+                    className="ml-1 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground text-center py-6">
+              No keywords added yet. Add keywords to get started.
+            </p>
+          )}
+        </div>
+
+
+      </CardContent>
+      <CardFooter className="flex justify-between">
+        <Button variant="outline">Reset</Button>
+        <Button type="button" onClick={() => saveKeywords(keywords, unipileId)}>Save Configuration</Button>
+      </CardFooter>
+    </Card>
+  )
+}
