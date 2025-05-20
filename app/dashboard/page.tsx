@@ -8,7 +8,7 @@ import { getKeywords } from "@/utils/supabase/queries"
 
 const DashboardPage = async () => {
   const { unipile_id } = await getUnipileId()
-    const keywords = await getKeywords(unipile_id)
+  const keywords = await getKeywords(unipile_id)
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-8 w-full">
