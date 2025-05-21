@@ -8,3 +8,11 @@ export interface KeywordsTable {
     unipile_id: string;
     unipile_table?: AccessIds
 }
+
+export interface FilterTimezoneReq {
+    unipile_id: string;
+    user_timezone: {
+        timezone: string;
+        created_at: string;
+    }
+}

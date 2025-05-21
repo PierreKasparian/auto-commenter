@@ -5,6 +5,7 @@ import { useState } from "react"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -14,6 +15,7 @@ export default function LoginForm() {
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [timezone, setTimezone] = useState("")
 
   const handleLogin = async () => {
     setIsSubmitted(true)
@@ -21,9 +23,9 @@ export default function LoginForm() {
     setIsSubmitted(false)
   }
 
-  const handleSignup = async () => {
+  const handleSignup = async (email: string, password: string, timezone: string) => {
     setIsSubmitted(true)
-    await signup(email, password)
+    await signup(email, password,timezone)
     setIsSubmitted(false)
   }
 
@@ -68,6 +70,7 @@ export default function LoginForm() {
                         type="password" 
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
+                        placeholder="xxx-xxx-xxx" 
                         required 
                       />
                     </div>
@@ -107,18 +110,42 @@ export default function LoginForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required 
+                        placeholder="xxx-xxx-xxx" 
                       />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="timezone">Timezone</Label>
+                      <Select
+                        value={timezone}
+                        onValueChange={setTimezone}
+                        required
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select your timezone" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Europe/London">UTC</SelectItem>
+                          <SelectItem value="Europe/Paris">UTC+1 (Paris, Berlin)</SelectItem>
+                          <SelectItem value="America/New_York">UTC-5 (New York)</SelectItem>
+                          <SelectItem value="America/Los_Angeles">UTC-8 (San Francisco)</SelectItem>
+                          <SelectItem value="Asia/Shanghai">UTC+8 (Beijing)</SelectItem>
+                          <SelectItem value="Asia/Tokyo">UTC+9 (Tokyo)</SelectItem>
+                          <SelectItem value="Australia/Sydney">UTC+10 (Sydney)</SelectItem>
+                          <SelectItem value="Australia/Melbourne">UTC+11 (Melbourne)</SelectItem>
+                          <SelectItem value="America/Sao_Paulo">UTC-3 (São Paulo)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                     {isSubmitted ? (
                       <Button className="w-full" disabled>
                         Creating account...
                       </Button>
-                    ) : email === "" || password.length < 6 ? (
+                    ) : email === "" || password.length < 6 || timezone === "" ? (
                       <Button className="w-full" disabled>
                         Create account <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     ) : (
-                      <Button className="w-full" onClick={handleSignup}>
+                      <Button className="w-full" onClick={() => handleSignup(email, password, timezone)}>
                         Create account <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     )}

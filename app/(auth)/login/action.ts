@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
+import { getErrorRedirect } from '@/utils/helpers'
 
 export async function login(email:string,password:string) {
   const supabase = await createClient()
@@ -16,13 +17,13 @@ export async function login(email:string,password:string) {
   const { error } = await supabase.auth.signInWithPassword(data)
 
   if (error) {
-    redirect('/error')
+    redirect(getErrorRedirect("/login","Erreur",error.message))
   }
   revalidatePath('/', 'layout')
   redirect('/dashboard')
 }
 
-export async function signup(email:string,password:string) {
+export async function signup(email:string,password:string,timezone:string) {
   const supabase = await createClient()
 
   const data = {
@@ -30,13 +31,26 @@ export async function signup(email:string,password:string) {
     password: password,
   }
 
-  const { error } = await supabase.auth.signUp(data)
+const { data:user, error } = await supabase.auth.signUp(data)
 
-  if (error) {
-    console.log('error in action')
-    console.log(error)
-    redirect('/error')
-  }
+if (error ) {
+  console.log(error)
+  redirect(getErrorRedirect("/login","Erreur",error.message))
+}
+if (!user) {
+  redirect(getErrorRedirect("/login","Erreur","No user"))
+}
+const { error: profileError } = await supabase.from('user_timezone').insert({
+  user_id: user.user!.id,
+  timezone: timezone
+})
+
+if (profileError) {
+  console.log(profileError.message)
+  redirect(getErrorRedirect("/login","Erreur","Essayez un autre compte. "+profileError.message))
+}
+
+
 
   revalidatePath('/', 'layout')
   redirect('/login/confirm')

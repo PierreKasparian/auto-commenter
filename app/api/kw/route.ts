@@ -65,7 +65,7 @@ export async function POST(req: Request) {
   //   //     }),
   //   //   }
   //   // );
-  //   const { data, error } = await supabase.from("comment-time").insert([
+  //   const { data, error } = await supabase.from("comment_time").insert([
   //     {
   //       id: account.id,
   //       comment_time: today.toISOString(),

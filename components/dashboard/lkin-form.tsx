@@ -20,7 +20,9 @@ export function LinkedInConnectForm() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm">Aucun compte LinkedIn connecté</p>
+        <p className="text-sm">No Linkedin account connected</p>
+        <div className="flex items-center space-x-2">
+          <p className="text-xs text-muted-foreground">How to get your Linkedin access token</p>
         <Button
           variant="ghost"
           size="icon"
@@ -29,24 +31,24 @@ export function LinkedInConnectForm() {
           aria-label="Informations sur l'access token"
         >
           <Info className="h-4 w-4" />
-        </Button>
+        </Button></div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="space-y-2">
           <Input
             type="password"
-            placeholder="Entrez votre access token LinkedIn"
+            placeholder="Enter your Linkedin access token"
             value={accessToken}
             onChange={(e) => setAccessToken(e.target.value)}
             className="w-full"
           />
           <p className="text-xs text-muted-foreground">
-            Votre token est stocké de manière sécurisée et n&apos;est utilisé que pour les actions autorisées.
+            Your token is stored securely and is only used for authorized actions.
           </p>
         </div>
         <Button type="submit" className="w-full bg-[#0A66C2] hover:bg-[#004182]" disabled={!accessToken.trim()}>
-          Connecter mon compte LinkedIn
+          Connect my LinkedIn account
         </Button>
       </form>
 

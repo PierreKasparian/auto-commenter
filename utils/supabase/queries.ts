@@ -29,7 +29,7 @@ export const getUnipileId = async () => {
     redirect(getErrorRedirect("/dashboard", "No user"));
   }
   const { data: unipileData, error: unipileError } = await supabase
-    .from("unipile-id")
+    .from("unipile_id")
     .select("unipile_id,access_token")
     .eq("user_id", data.user.id);
   if (unipileError) {
@@ -111,7 +111,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
       redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
     }
     const { data: unipileData, error: unipileError } = await supabase
-      .from("unipile-id")
+      .from("unipile_id")
       .insert({
         unipile_id: result.account_id,
         access_token: accessToken,
