@@ -10,11 +10,14 @@ export default async function Home() {
     //     account_id: "z5SmJeA9SEW1-L2fXSSqrg"
     //   }),
     // });}
-    await fetch("http://localhost:3000/api/cron", {
-      method: "GET",
+    await fetch("http://localhost:3000/api/kw", {
+      method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.CRON_SECRET}`,
+        Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
       },
+      body: JSON.stringify({
+        account_id: "HYRdNXu7QpK1eBVPxT2Qlg"
+      }),
     });}
   return
 }
