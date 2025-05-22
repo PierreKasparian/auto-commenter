@@ -56,45 +56,25 @@ export async function POST(req: Request) {
     redirect: "follow",
   };
 
-  const response = await fetch(
+  const posts = await fetch(
     "https://api12.unipile.com:14269/api/v1/linkedin/search?account_id=2lmjFJd6RjmKn4oA2VNbNA",
     requestOptions as RequestInit
   )
-    .then((response) => {
-      console.log(response)
-      return response.text()
-    })
-    .then((result) => console.log(result))
+    .then((response) => response.json())
     .catch((error) => console.error(error));
-  console.log(response)
-  // console.log(posts)
-  // for (const post of posts.items) {
-  //   if (Number(post.date.slice(0, -1)) < 12) {
-  //     //faiblesse dans l'approche
-  //     console.log(post);
-  //   }
-  // }
+  console.log(posts)
+  for (const post of posts.items) {
+    console.log(post)
+    if (Number(post.date.slice(0, -1)) < 12) {//faiblesse dans l'approche
+      console.log("carré");
+    }
+  }
 
-  // console.log(posts);
 
-  // //2. parcourir le script voir si on trouve le mot clé
-  // //3. il faut commenter
+  //2. parcourir le script voir si on trouve le mot clé
+  //3. il faut commenter
 
-  // //mauvaise requete
-  // const response = await fetch(
-  //   "https://api12.unipile.com:14269/api/v1/accounts",
-  //   requestOptions as RequestInit
-  // )
-  //   .then((response) => {
-  //     return response.json();
-  //   })
-  //   .then((result) => {
-  //     return result.items;
-  //   })
-  //   .catch((error) => {
-  //     console.log(error);
-  //     return console.error(error);
-  //   });
+
 
   return NextResponse.json({ ok: true });
 }
