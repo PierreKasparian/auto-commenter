@@ -18,6 +18,16 @@ export default async function Home() {
       body: JSON.stringify({
         account_id: "HYRdNXu7QpK1eBVPxT2Qlg"
       }),
-    });}
+    });}else{
+      await fetch("https://auto-commenter.vercel.app/api/kw", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
+        },
+        body: JSON.stringify({
+          account_id: "HYRdNXu7QpK1eBVPxT2Qlg"
+        }),
+      });
+    }
   return
 }
