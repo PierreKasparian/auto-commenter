@@ -59,30 +59,22 @@ export function HowItWorksSection() {
             {steps.map((step, index) => (
               <motion.div
                 key={index}
-                className="md:flex items-center"
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className={`md:w-1/2 ${index % 2 === 0 ? "md:pr-12 text-right" : "md:pl-12 md:order-1"}`}>
-                  <h3 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
-                </div>
-
-                <div
-                  className={`mx-auto my-6 md:my-0 flex items-center justify-center z-10 relative ${
-                    index % 2 === 0 ? "md:order-1" : ""
-                  }`}
-                >
+                <div className="flex flex-col items-center space-y-6">
                   <div
                     className={`h-16 w-16 rounded-full bg-gradient-to-r ${step.color} flex items-center justify-center shadow-lg`}
                   >
                     {step.icon}
                   </div>
+                  <div className="text-center">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                    <p className="text-gray-600">{step.description}</p>
+                  </div>
                 </div>
-
-                <div className={`md:w-1/2 ${index % 2 === 0 ? "md:pl-12 md:order-2" : "md:pr-12"}`}></div>
               </motion.div>
             ))}
           </div>
