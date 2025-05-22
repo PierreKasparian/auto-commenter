@@ -1,12 +1,30 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { Groq } from 'groq-sdk';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
+const groq = new Groq();
+async function getComment(post:string) {
+  const chatCompletion = await groq.chat.completions.create({
+    "messages": [
+      {
+        "role": "user",
+        "content": "Comment this post:\n"+post
+      }
+    ],
+    "model": "meta-llama/llama-4-scout-17b-16e-instruct",
+    "temperature": 1,
+    "top_p": 1,
+    "stream": false,
+    "stop": null
+  });
 
+  return chatCompletion.choices[0]?.message.content;
+}
 export async function POST(req: Request) {
   const body = await req.json();
   console.log(body);
@@ -32,7 +50,6 @@ export async function POST(req: Request) {
   }
   if (!keywords) return;
 
-  //1. il faut trouver un post. (que keywords pour le moment)-> fetch puis search via api
   const myHeaders = new Headers();
   myHeaders.append(
     "X-API-KEY",
@@ -67,20 +84,22 @@ export async function POST(req: Request) {
     console.log(post);
     if (Number(post.date.slice(0, -1)) <= 12) {//faiblesse dans l'approche
       console.log("dedans")
+
+
+      
+      const comment = await getComment(post.text);
       const {error}= await supabase
         .from("posts_comment")
         .insert({
           unipile_id: account_id,
           post_text: post.text,
           post_link:"youtube.com",
-          comment_IA:"test"
+          comment_IA:comment
         })
         if(error)console.log(error);
     }
   }
 
-  //2. parcourir le script voir si on trouve le mot clé
-  //3. il faut commenter
 
   return NextResponse.json({ ok: true });
 }
