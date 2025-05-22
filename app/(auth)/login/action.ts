@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
 import { createClient } from '@/utils/supabase/server'
-import { getErrorRedirect } from '@/utils/helpers'
+import { getErrorRedirect, getStatusRedirect } from '@/utils/helpers'
 
 export async function login(email:string,password:string) {
   const supabase = await createClient()
@@ -20,7 +20,7 @@ export async function login(email:string,password:string) {
     redirect(getErrorRedirect("/login","Erreur",error.message))
   }
   revalidatePath('/', 'layout')
-  redirect('/dashboard')
+  redirect(getStatusRedirect("/dashboard","Success ! 🎉","You have been logged in"))
 }
 
 export async function signup(email:string,password:string,timezone:string) {
@@ -53,5 +53,5 @@ if (profileError) {
 
 
   revalidatePath('/', 'layout')
-  redirect('/login/confirm')
+  redirect(getStatusRedirect("/login/confirm","Success ! 🎉","You have signed up"))
 }

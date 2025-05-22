@@ -42,10 +42,11 @@ export function Navbar() {
             <Link href="#pricing" className="text-gray-600 hover:text-teal-600 transition-colors">
               Pricing
             </Link>
-            <Button variant="outline" className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50">
+            <Button variant="outline" className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50" onClick={() => {
+              window.location.href = "/login"
+            }}>
               Login
             </Button>
-            <Button className="bg-teal-600 hover:bg-teal-700 text-white">Free trial</Button>
           </nav>
 
           {/* Mobile menu button */}
@@ -93,10 +94,11 @@ export function Navbar() {
               Pricing
             </Link>
             <div className="pt-4 space-y-3">
-              <Button variant="outline" className=" w-full border-teal-600 text-teal-600 bg-white hover:bg-teal-50">
+              <Button variant="outline" className=" w-full border-teal-600 text-teal-600 bg-white hover:bg-teal-50" onClick={() => {
+                window.location.href = "/login"
+              }}>
                 Login
               </Button>
-              <Button className="w-full bg-teal-600 hover:bg-teal-700 text-white">Free trial</Button>
             </div>
           </div>
         </motion.div>
