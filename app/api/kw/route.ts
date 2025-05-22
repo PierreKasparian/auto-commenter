@@ -65,7 +65,8 @@ export async function POST(req: Request) {
   console.log(posts);
   for (const post of posts.items) {
     console.log(post);
-    if (Number(post.date.slice(0, -1)) <= 12 && post.text.split(' ').includes("IA")) {//faiblesse dans l'approche
+    if (Number(post.date.slice(0, -1)) <= 12) {//faiblesse dans l'approche
+      console.log("dedans")
       const {error}= await supabase
         .from("posts_comment")
         .insert({

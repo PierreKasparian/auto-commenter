@@ -31,6 +31,6 @@ export default async function Home() {
     }
   return(
   <>
-<iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7329147539604045824" height="1388" width="504" frameBorder={0} allowFullScreen title="Post intégré"></iframe>
+
   </>
 )}
