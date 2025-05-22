@@ -10,7 +10,7 @@ export default async function Home() {
     //     account_id: "z5SmJeA9SEW1-L2fXSSqrg"
     //   }),
     // });}
-    await fetch("http://localhost:3000/api/kw", {
+    await fetch("https://auto-commenter.vercel.app/api/kw", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,

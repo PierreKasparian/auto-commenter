@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   // const account_id = body.account_id;
-
+  console.log("passé")
 
   const { data: keywords, error: keywordsError } = {
     data: { keywords: ["IA"] },
