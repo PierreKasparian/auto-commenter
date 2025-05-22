@@ -71,7 +71,7 @@ export async function POST(req: Request) {
   myHeaders.append("content-type", "application/json");
 
   const linkedInUrl = `https://www.linkedin.com/search/results/content/?datePosted="past-24h"&keywords=${keywords.keywords.join("%20")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
-
+  console.log(linkedInUrl);
   const raw = JSON.stringify({
     api: "classic",
     category: "people",
