@@ -91,11 +91,10 @@ export async function POST(req: Request) {
   )
     .then((response) => response.json())
     .catch((error) => console.error(error));
+  console.log(posts);
   for (const post of posts.items) {
-    if (Number(post.date.slice(0, -1)) <= 12) {
+    if (Number(post.date.slice(0, -1)) <= 12) {      //faiblesse dans l'approche
       console.log(post);
-      //faiblesse dans l'approche
-      console.log("dedans");
       createComment(post.text, post.share_url, account_id);
     }
   }
