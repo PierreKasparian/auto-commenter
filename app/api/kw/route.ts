@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   const raw = JSON.stringify({
     api: "classic",
     category: "people",
-    url: encodeURI(linkedInUrl),
+    url: linkedInUrl,
   });
 
   const requestOptions = {
