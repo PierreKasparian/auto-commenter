@@ -56,13 +56,17 @@ export async function POST(req: Request) {
     redirect: "follow",
   };
 
-  fetch(
+  const response = await fetch(
     "https://api12.unipile.com:14269/api/v1/linkedin/search?account_id=2lmjFJd6RjmKn4oA2VNbNA",
     requestOptions as RequestInit
   )
-    .then((response) => response.text())
+    .then((response) => {
+      console.log(response)
+      return response.text()
+    })
     .then((result) => console.log(result))
     .catch((error) => console.error(error));
+  console.log(response)
   // console.log(posts)
   // for (const post of posts.items) {
   //   if (Number(post.date.slice(0, -1)) < 12) {
