@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient, PostgrestError } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import { Groq } from "groq-sdk";
 // import { LinkedInPost } from "@/types";
 
@@ -110,7 +110,7 @@ export async function POST(req: Request) {
     "\n--------------------------------------\n\n" +
       (
         keywords.unipile_id as unknown as {
-          com_per_day_max: any;
+          com_per_day_max: number;
         }
       ).com_per_day_max
   );
@@ -122,7 +122,7 @@ export async function POST(req: Request) {
         Number(
           (
             keywords.unipile_id as unknown as {
-              com_per_day_max: any;
+              com_per_day_max: number;
             }
           ).com_per_day_max &&
             post.text.length > 100 &&
@@ -139,6 +139,7 @@ export async function POST(req: Request) {
         account_id
       );
       // if (response)
+      console.log(response)
       n_commments++;
     }
   }

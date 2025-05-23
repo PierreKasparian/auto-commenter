@@ -6,7 +6,7 @@ import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card"
 import { getUnipileId } from "@/utils/supabase/queries"
 import { getKeywords } from "@/utils/supabase/queries"
 // import {CommentCard} from "@/components/dashboard/comment-card"
-import { getComments } from "@/utils/supabase/queries"
+// import { getComments } from "@/utils/supabase/queries"
 
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId()
