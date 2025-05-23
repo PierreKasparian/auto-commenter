@@ -8,7 +8,7 @@ import { PricingSection } from "@/components/landing/pricing-section";
 
 export default async function Home() {
   if(process.env.NEXT_ENV === "development"){
-    await fetch("https://auto-commenter.vercel.app/api/kw", {
+    await fetch("http://localhost:3000/api/kw", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,

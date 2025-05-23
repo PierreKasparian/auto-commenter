@@ -16,3 +16,22 @@ export interface FilterTimezoneReq {
         created_at: string;
     }
 }
+
+export interface LinkedInPost {
+    type: string;
+    provider: string;
+    social_id: string;
+    share_url: string;
+    date: string;
+    parsed_datetime: string;
+    comment_counter: number;
+    impressions_counter: number;
+    reaction_counter: number;
+    repost_counter: number;
+    permissions: object;
+    text: string;
+    attachments: any[];
+    author: object;
+    is_repost: boolean;
+    id: string;
+}

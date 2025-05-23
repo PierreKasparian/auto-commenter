@@ -1,7 +1,7 @@
-export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, PostgrestError } from "@supabase/supabase-js";
 import { Groq } from "groq-sdk";
+// import { LinkedInPost } from "@/types";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,6 +40,10 @@ async function createComment(
   });
   if (error) console.log(error);
 }
+
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   const body = await req.json();
   console.log(body);
@@ -49,14 +53,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const account_id = body.account_id;
-  console.log("passé");
 
   const { data: keywords, error: keywordsError } = await supabase
     .from("keywords")
-    .select("keywords")
+    .select("keywords, unipile_id(com_per_day_max)")
     .eq("unipile_id", account_id)
     .single();
 
+  console.log(keywords);
   if (keywordsError) {
     console.log(keywordsError);
   }
@@ -70,7 +74,10 @@ export async function POST(req: Request) {
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
 
-  const linkedInUrl = `https://www.linkedin.com/search/results/content/?datePosted="past-24h"&keywords=${keywords.keywords.join(" OR ").split(" ").join("%20")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
+  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=${keywords.keywords
+    .join(" OR ")
+    .split(" ")
+    .join("%20")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
   console.log(linkedInUrl);
   const raw = JSON.stringify({
     api: "classic",
@@ -86,16 +93,53 @@ export async function POST(req: Request) {
   };
 
   const posts = await fetch(
-    `https://api12.unipile.com:14269/api/v1/linkedin/search?account_id=${account_id}`,
+    `https://api12.unipile.com:14269/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
     requestOptions as RequestInit
   )
     .then((response) => response.json())
     .catch((error) => console.error(error));
+
+  //   //comment long
+  // posts.items.sort((a: LinkedInPost, b: LinkedInPost) => {
+  //   const textLengthA = a.text ? a.text.length : 0;
+  //   const textLengthB = b.text ? b.text.length : 0;
+  //   return textLengthB - textLengthA;
+  // });
   console.log(posts);
+  console.log(
+    "\n--------------------------------------\n\n" +
+      (
+        keywords.unipile_id as unknown as {
+          com_per_day_max: any;
+        }
+      ).com_per_day_max
+  );
+  let n_commments = 0;
   for (const post of posts.items) {
-    if (Number(post.date.slice(0, -1)) <= 12) {      //faiblesse dans l'approche
-      console.log(post);
-      createComment(post.text, post.share_url, account_id);
+    if (
+      (Number(post.date.slice(0, -1)) <= 12 || post.date.slice(-1) === "m") &&
+      n_commments <
+        Number(
+          (
+            keywords.unipile_id as unknown as {
+              com_per_day_max: any;
+            }
+          ).com_per_day_max &&
+            post.text.length > 100 &&
+            post.permissions.can_post_comments
+        )
+      //  && keywords.keywords.some((el: string) =>
+      //   post.text.split(/[\s.,;!?]+/).includes(el)
+      // )
+    ) {
+      //faiblesse dans l'approche
+      const response = await createComment(
+        post.text,
+        post.share_url,
+        account_id
+      );
+      // if (response)
+      n_commments++;
     }
   }
 

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { LogOut, Linkedin } from 'lucide-react'
 
 
-export function LinkedInAccountCard({unipileId}: {unipileId: string}) {
+export function LinkedInAccountCard({unipileId}: {unipileId: string | null}) {
 
 
   return (

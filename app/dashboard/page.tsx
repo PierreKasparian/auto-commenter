@@ -5,10 +5,14 @@ import AccountsChoose from "@/components/dashboard/accounts-choose"
 import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card"
 import { getUnipileId } from "@/utils/supabase/queries"
 import { getKeywords } from "@/utils/supabase/queries"
+// import {CommentCard} from "@/components/dashboard/comment-card"
+import { getComments } from "@/utils/supabase/queries"
 
 const DashboardPage = async () => {
-  const { unipile_id } = await getUnipileId()
-  const keywords = await getKeywords(unipile_id)
+  const unipile_id = await getUnipileId()
+  console.log("unipile",unipile_id)
+  const keywords = await getKeywords() 
+  // const comments = await getComments() 
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="space-y-8 w-full">
@@ -28,8 +32,10 @@ const DashboardPage = async () => {
         {unipile_id && (
           <div className="space-y-8 w-full">
             <Separator />
-
+<div className="w-full flex flex-row">
                 <KeywordsChoose unipileId={unipile_id} kw={keywords} />
+                {/* <CommentCard example={comments} deleteCommentExample={() => {}} /> */}
+                </div>
 
 
             {/* Accounts Configuration */}
