@@ -1,13 +1,14 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Menu, X } from "lucide-react"
-import { motion } from "framer-motion"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { signOut } from "@/utils/supabase/queries";
 
-export function Navbar() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
     <motion.header
@@ -32,22 +33,59 @@ export function Navbar() {
           </div>
 
           {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="#features" className="text-gray-600 hover:text-teal-600 transition-colors">
-              Features
-            </Link>
-            <Link href="#how-it-works" className="text-gray-600 hover:text-teal-600 transition-colors">
-              How it works
-            </Link>
-            <Link href="#pricing" className="text-gray-600 hover:text-teal-600 transition-colors">
-              Pricing
-            </Link>
-            <Button variant="outline" className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50" onClick={() => {
-              window.location.href = "/login"
-            }}>
-              Login
-            </Button>
-          </nav>
+          {!isDashboard ? (
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link
+                href="#features"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Features
+              </Link>
+              <Link
+                href="#how-it-works"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                How it works
+              </Link>
+              <Link
+                href="#pricing"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Pricing
+              </Link>
+              <Button
+                variant="outline"
+                className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50"
+                onClick={() => {
+                  window.location.href = "/login";
+                }}
+              >
+                Login
+              </Button>
+            </nav>
+          ) : (
+            <nav className="hidden md:flex items-center space-x-8">
+              <Link
+                href="/dashboard"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Dashboard
+              </Link>
+              <Link
+                href="/dashboard/buy"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Buy credits
+              </Link>
+              <Button
+                variant="outline"
+                className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50"
+                onClick={signOut}
+              >
+                Logout
+              </Button>
+            </nav>
+          )}
 
           {/* Mobile menu button */}
           <div className="md:hidden">
@@ -72,37 +110,71 @@ export function Navbar() {
           transition={{ duration: 0.3 }}
         >
           <div className="container mx-auto px-4 py-4 space-y-4">
-            <Link
-              href="#features"
-              className="block text-gray-600 hover:text-teal-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Features
-            </Link>
-            <Link
-              href="#how-it-works"
-              className="block text-gray-600 hover:text-teal-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              How it works
-            </Link>
-            <Link
-              href="#pricing"
-              className="block text-gray-600 hover:text-teal-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Pricing
-            </Link>
-            <div className="pt-4 space-y-3">
-              <Button variant="outline" className=" w-full border-teal-600 text-teal-600 bg-white hover:bg-teal-50" onClick={() => {
-                window.location.href = "/login"
-              }}>
-                Login
-              </Button>
-            </div>
+            {isDashboard ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="block text-gray-600 hover:text-teal-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Dashboard
+                </Link>
+                <Link
+                  href="/dashboard/buy"
+                  className="block text-gray-600 hover:text-teal-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Buy credits
+                </Link>
+                <div className="pt-4 space-y-3">
+                  <Button
+                    variant="outline"
+                    className=" w-full border-teal-600 text-teal-600 bg-white hover:bg-teal-50"
+                    onClick={signOut}
+                  >
+                    Logout
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="#features"
+                  className="block text-gray-600 hover:text-teal-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Features
+                </Link>
+                <Link
+                  href="#how-it-works"
+                  className="block text-gray-600 hover:text-teal-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  How it works
+                </Link>
+                <Link
+                  href="#pricing"
+                  className="block text-gray-600 hover:text-teal-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Pricing
+                </Link>
+                <div className="pt-4 space-y-3">
+                  <Button
+                    variant="outline"
+                    className=" w-full border-teal-600 text-teal-600 bg-white hover:bg-teal-50"
+                    onClick={() => {
+                      window.location.href = "/login";
+                    }}
+                  >
+                    Login
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </motion.div>
       )}
     </motion.header>
-  )
+  );
 }

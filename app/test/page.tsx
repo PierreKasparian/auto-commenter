@@ -29,7 +29,7 @@ const page = async () => {
 // });
 
 
-const res = await retrieveQdrantCom("sdf",Array(1536).fill(100));
+const res = await retrieveQdrantCom({unipile_id:"sdf",vectorSearch:{queryVector:Array(1536).fill(100)}});
 console.log(res)
 // const body = await response.json();
 // console.log(body);

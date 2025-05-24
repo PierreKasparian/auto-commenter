@@ -13,7 +13,7 @@ async function generateComment(post: string) {
     messages: [
       {
         role: "user",
-        content: "Comment this post:\n" + post,
+        content: "Comment this post, make it short !:\n" + post,
       },
     ],
     model: "meta-llama/llama-4-scout-17b-16e-instruct",
@@ -29,16 +29,21 @@ async function generateComment(post: string) {
 async function createComment(
   post: string,
   post_link: string,
-  account_id: string
+  account_id: string,
+  author_name: string,
+  post_id: string
 ) {
   const comment = await generateComment(post);
-  const { error } = await supabase.from("posts_comment").insert({
+  const { error } = await supabase.from("comment_proposal").insert({
     unipile_id: account_id,
     post_text: post,
     post_link: post_link,
     comment_IA: comment,
+    author_name: author_name,
+    post_id: post_id,
   });
-  if (error) console.log(error);
+  if (error) return {error:error};
+  return {error:null};
 }
 
 export const maxDuration = 60;
@@ -106,6 +111,7 @@ export async function POST(req: Request) {
   //   return textLengthB - textLengthA;
   // });
   console.log(posts);
+  // return Next/Response.json({ok:true});
   console.log(
     "\n--------------------------------------\n\n" +
       (
@@ -136,11 +142,12 @@ export async function POST(req: Request) {
       const response = await createComment(
         post.text,
         post.share_url,
-        account_id
+        account_id,
+        post.author.name,
+        post.social_id
       );
-      // if (response)
+      if (!response.error) n_commments++;
       console.log(response)
-      n_commments++;
     }
   }
 

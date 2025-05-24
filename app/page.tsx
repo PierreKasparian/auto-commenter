@@ -5,22 +5,24 @@ import { HeroSection } from "@/components/landing/hero-section";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { Navbar } from "@/components/landing/navbar";
 import { PricingSection } from "@/components/landing/pricing-section";
+import { createClient } from "@/utils/supabase/server";
 
 export default async function Home() {
-  if(process.env.NEXT_ENV === "development"){
-    await fetch("http://localhost:3000/api/kw", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
-      },
-      body: JSON.stringify({
-        account_id: "HYRdNXu7QpK1eBVPxT2Qlg"
-      }),
-    });}
-    
+  // if(process.env.NEXT_ENV === "development"){
+  //   await fetch("http://localhost:3000/api/kw", {
+  //     method: "POST",
+  //     headers: {
+  //       Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
+  //     },
+  //     body: JSON.stringify({
+  //       account_id: "ovD09TapSnC9cB2ABeVCNw"
+  //     }),
+  //   });}
+  const supabase = await createClient();
+  const { data: user } = await supabase.auth.getUser();
   return(
     <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <Navbar />
+      <Navbar isDashboard={user.user !== null}/>
       <main>
         <HeroSection />
         <FeaturesSection />

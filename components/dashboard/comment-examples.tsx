@@ -2,26 +2,21 @@ import { Suspense } from "react"
 import { CommentExamplesList } from "./comment-examples-list"
 import { AddCommentForm } from "./add-comment-form"
 
-export interface CommentExample {
-  id: string
-  text: string
-  context: string
-  createdAt: Date
-}
 
-export default function CommentExamplesComponent() {
+
+export default function YourTone() {
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-sm border overflow-hidden">
-      <div className="p-6 border-b bg-gradient-to-r from-teal-500 to-emerald-500">
-        <h2 className="text-xl font-semibold text-white">Your Comment Examples</h2>
-        <p className="text-teal-50">Add examples of comments you&apos;ve made to help our AI match your tone and style</p>
+      <div className="p-6 border-b">
+        <h2 className="text-lg font-semibold text-black">Your comment tone</h2>
+        <p className="text-muted-foreground">Add examples of comments you&apos;ve made to help our AI match your tone and style</p>
       </div>
 
       <div className="p-6">
         <AddCommentForm />
 
         <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Your saved examples</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Your posted comments</h3>
           <Suspense fallback={<CommentExamplesLoading />}>
             <CommentExamplesList />
           </Suspense>

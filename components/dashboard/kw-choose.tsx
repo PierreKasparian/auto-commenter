@@ -38,7 +38,7 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>LinkedIn Keyword Automation</CardTitle>
+        <CardTitle className="text-lg font-semibold text-black">LinkedIn Keyword Automation</CardTitle>
         <CardDescription>Choose keywords that trigger automatic comments on LinkedIn posts</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">

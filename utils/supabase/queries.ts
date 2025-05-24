@@ -200,6 +200,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
       const post = await getPostFromId(comment.post_id, result.account_id);
       console.log(post);
       await qdrantSavePost(post.text, comment.text, result.account_id);
+      await new Promise(resolve => setTimeout(resolve, 1)); //ids are time generated
     }
   } catch (error) {
     console.log(error);
@@ -214,17 +215,16 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   );
 }
 
-export async function getComments() {
+export async function getCommentsProposals(id?: string){
+  const unipile_id = id ?? await getUnipileId();
   const supabase = await createClient();
-  const unipile_id = await getUnipileId();
-  if (!unipile_id) return [];
-  const { data: comments, error: commentsError } = await supabase
-    .from("example_comment")
-    .select("comments")
-    .eq("unipile_id", unipile_id);
-  if (commentsError) {
-    console.log(commentsError);
-    return [];
-  }
-  return comments?.[0]?.comments ?? [];
+  const { data, error } = await supabase.from("comment_proposal").select("id,created_at,post_text,post_link,comment_IA,author_name,post_id").eq("unipile_id",unipile_id);
+  if (error)console.log(error);
+  return data;
+}
+
+export async function delCommentProposal(id:string){
+  const supabase = await createClient();
+  const { error } = await supabase.from("comment_proposal").delete().eq("id",id);
+  return {error:error}
 }

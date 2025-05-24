@@ -35,3 +35,61 @@ export interface LinkedInPost {
     is_repost: boolean;
     id: string;
 }
+
+export interface QdrantSearchResult {
+    id: string | number;
+    version: number;
+    score: number;
+    payload?: {unipile_id:string,comment:string,post:string};
+    vector?: number[];
+    shard_key?: string | number | Record<string, unknown> | null | undefined;
+    order_value?: number | Record<string, unknown> | null | undefined;
+}
+
+export interface QdrantResponse extends AllComments {
+    points: QdrantSearchResult[];
+}
+
+export interface CommentVectorSearch {
+    id: string | number;
+    version: number;
+    score: number;
+    payload?: Record<string, unknown> | {
+        [key: string]: unknown;
+    } | null | undefined;
+    vector?: Record<string, unknown> | number[] | number[][] | {
+        [key: string]: number[] | number[][] | {
+            indices: number[];
+            values: number[];
+        } | undefined;
+    } | null | undefined;
+    shard_key?: string | number | Record<string, unknown> | null | undefined;
+    order_value?: number | Record<string, unknown> | null | undefined;
+}[]
+export interface AllComments {
+    points: {
+        id: string | number;
+        payload?: Record<string, unknown> | {
+            [key: string]: unknown;
+        } | null | undefined;
+        vector?: Record<string, unknown> | number[] | number[][] | {
+            [key: string]: number[] | number[][] | {
+                indices: number[];
+                values: number[];
+            } | undefined;
+        } | null | undefined;
+        shard_key?: string | number | Record<string, unknown> | null | undefined;
+        order_value?: number | Record<string, unknown> | null | undefined;
+    }[];
+    next_page_offset?: string | number | Record<string, unknown> | null | undefined;
+}
+
+export interface CommentProposal{
+    id: string;
+    created_at: string;
+    post_text: string;
+    post_link: string;
+    comment_IA: string;
+    author_name: string;
+    post_id: string;
+}[]

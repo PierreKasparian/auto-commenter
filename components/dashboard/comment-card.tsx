@@ -3,11 +3,14 @@
 import { useState } from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { CommentExample } from "./comment-examples"
+import type { CommentVectorSearch, QdrantSearchResult } from "@/types"
+import { AllComments } from "@/types"
 
 interface CommentCardProps {
-  example: CommentExample
-  deleteCommentExample: (id: string) => Promise<void>
+  example: QdrantSearchResult
+  deleteCommentExample: (id: number|string) => Promise<{
+    success: boolean;
+}>
 }
 
 export function CommentCard({ example, deleteCommentExample }: CommentCardProps) {
@@ -23,12 +26,13 @@ export function CommentCard({ example, deleteCommentExample }: CommentCardProps)
       setIsDeleting(false)
     }
   }
+  // console.log(comments.points[0].payload)
 
   return (
     <div className="border rounded-lg overflow-hidden group">
       <div className="bg-gray-50 px-4 py-2 flex justify-between items-center">
         <div>
-          <span className="text-sm font-medium text-gray-700">{example.context}</span>
+          <span className="leading-relaxed whitespace-pre-line break-words">{example.payload?.post}</span>
         </div>
         <Button
           variant="ghost"
@@ -42,7 +46,7 @@ export function CommentCard({ example, deleteCommentExample }: CommentCardProps)
         </Button>
       </div>
       <div className="p-4 bg-white">
-        <p className="text-gray-700">{example.text}</p>
+        <p className="text-gray-700 leading-relaxed whitespace-pre-line break-words">{example.payload?.comment}</p>
       </div>
     </div>
   )

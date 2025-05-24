@@ -16,7 +16,7 @@ export function HowItWorksSection() {
       icon: <MessageSquare className="h-8 w-8 text-white" />,
       title: "AI writes the comments",
       description:
-        "Our AI analyzes the posts and writes relevant comments in your writing style.",
+        "Our AI analyzes the posts and writes relevant comments in your writing style. Posts with documents or videos are not supported yet.",
       color: "from-emerald-500 to-emerald-600",
     },
     {
