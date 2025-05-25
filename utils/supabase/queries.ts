@@ -78,6 +78,7 @@ export const getKeywords = async () => {
 };
 
 export async function getPostFromId(postId: string, unipileId: string) {
+  console.log("postID : ",postId,"unipileId",unipileId)
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
@@ -97,11 +98,12 @@ export async function getPostFromId(postId: string, unipileId: string) {
   )
     .then((response) => response.json())
     .catch((error) => console.error(error));
-
+  console.log("post : ",post)
   return post;
 }
 
-export async function getUserComments(unipileId: string) {
+async function getProviderId(unipile_id:string){
+  console.log("unipile_id from function",unipile_id)
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
@@ -112,12 +114,16 @@ export async function getUserComments(unipileId: string) {
     redirect: "follow",
   };
   const provider_id = await fetch(
-    "https://api12.unipile.com:14269/api/v1/users/me?account_id=" + unipileId,
+    "https://api12.unipile.com:14269/api/v1/users/me?account_id=" + unipile_id,
     requestOptions as RequestInit
-  )
-    .then((response) => response.json())
-    .then((result) => result.provider_id)
+  ).then((response) => response.json())
+    .then((result) => {console.log(result);return result.provider_id})
     .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
+  return provider_id
+}
+
+
+export async function getUserComments(unipileId: string,provider_id:string) {
 
   const comHeaders = new Headers();
   comHeaders.append(
@@ -139,6 +145,22 @@ export async function getUserComments(unipileId: string) {
     .then((response) => response.json())
     .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
   return comments;
+}
+
+export async function getProfilDesc(unipileId: string,provider_id:string) {
+  const myHeaders = new Headers();
+myHeaders.append("X-API-KEY", "1JEm4iqR.l2WOiZZ+iCFM00ttyLs4zNc8QCVXFgp6ZRkM/69L0OI=");
+myHeaders.append("accept", "application/json");
+
+const requestOptions = {
+  method: "GET",
+  headers: myHeaders,
+  redirect: "follow"
+};
+
+const response = await fetch("https://api12.unipile.com:14269/api/v1/users/"+provider_id+"?account_id="+unipileId, requestOptions as RequestInit)
+const result = await response.json()
+return result.headline
 }
 
 export async function linkedinConnect(accessToken: string, userAgent: string) {
@@ -164,7 +186,10 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
     "https://api12.unipile.com:14269/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
+  // await new Promise(resolve => setTimeout(resolve, 10000));
+
   const result = await response.json();
+  let provider_id;
   if (result.object == "AccountCreated") {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();
@@ -176,6 +201,10 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
       console.log("No user");
       redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
     }
+    provider_id = await getProviderId(result.account_id)
+    console.log("provider_id",provider_id)
+    const profileDescription = await getProfilDesc(result.account_id,provider_id)
+    console.log(profileDescription)
     const { error: unipileError } = await supabase
       .from("unipile_id")
       .insert({
@@ -184,8 +213,8 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
         user_id: data.user.id,
         user_agent: userAgent,
         com_per_day_max: 2, //a changer
+        profile_description: profileDescription ?? "",
       })
-      .single();
     if (unipileError) {
       console.log(unipileError);
       redirect(getErrorRedirect("/dashboard", "No user", unipileError.message));
@@ -194,13 +223,14 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
 
   await new Promise((resolve) => setTimeout(resolve, 2000));
   try {
-    const comments = await getUserComments(result.account_id);
-    console.log(comments);
+    const comments = await getUserComments(result.account_id,provider_id);
+    console.log("comments",comments)
     for (const comment of comments.items) {
-      const post = await getPostFromId(comment.post_id, result.account_id);
-      console.log(post);
-      await qdrantSavePost(post.text, comment.text, result.account_id);
-      await new Promise(resolve => setTimeout(resolve, 1)); //ids are time generated
+      if (comment.text.length > 10) {
+        const post = await getPostFromId(comment.post_urn, result.account_id);
+        await qdrantSavePost(post.text, comment.text, result.account_id);
+        await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
+      }
     }
   } catch (error) {
     console.log(error);
@@ -215,18 +245,24 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   );
 }
 
-export async function getCommentsProposals(id?: string){
-  const unipile_id = id ?? await getUnipileId();
+export async function getCommentsProposals(id?: string) {
+  const unipile_id = id ?? (await getUnipileId());
   const supabase = await createClient();
-  const { data, error } = await supabase.from("comment_proposal").select("id,created_at,post_text,post_link,comment_IA,author_name,post_id").eq("unipile_id",unipile_id);
-  if (error)console.log(error);
+  const { data, error } = await supabase
+    .from("comment_proposal")
+    .select("id,created_at,post_text,post_link,comment_IA,author_name,post_id")
+    .eq("unipile_id", unipile_id);
+  if (error) console.log(error);
   return data;
 }
 
-export async function delCommentProposal(id:string){
+export async function delCommentProposal(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase.from("comment_proposal").delete().eq("id",id);
-  if (error){
-    redirect(getErrorRedirect('/dashboard','Erreur,',error.message))
+  const { error } = await supabase
+    .from("comment_proposal")
+    .delete()
+    .eq("id", id);
+  if (error) {
+    redirect(getErrorRedirect("/dashboard", "Erreur,", error.message));
   }
 }

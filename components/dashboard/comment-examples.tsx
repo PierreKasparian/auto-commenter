@@ -16,7 +16,10 @@ export default function YourTone() {
         <AddCommentForm />
 
         <div className="mt-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Your posted comments</h3>
+          <h3 className="text-lg font-medium text-gray-900">Your posted comments</h3>
+          <p className="text-gray-500 text-sm mb-4">
+          Add a few examples to help our AI understand your commenting style. Delete examples if you don&apos;t want the IA to take example on them.
+        </p>
           <Suspense fallback={<CommentExamplesLoading />}>
             <CommentExamplesList />
           </Suspense>

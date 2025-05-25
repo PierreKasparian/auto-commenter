@@ -13,7 +13,7 @@ import { getCommentsProposals } from "@/utils/supabase/queries";
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
   const keywords = await getKeywords();
-  const commentsProposals = await getCommentsProposals(unipile_id??undefined);
+  const commentsProposals = await getCommentsProposals(unipile_id ?? undefined);
   return (
     <>
       <Navbar isDashboard={true} />
@@ -28,25 +28,29 @@ const DashboardPage = async () => {
               Automate your LinkedIn engagement with smart commenting
             </p>
           </div>
-
-<Separator />
-
+          <Separator />
           {/* Configuration Section */}
           {unipile_id && (
-            <div className="space-y-8 w-full">
-                      <CommentProposalsComponent commentsProposals={commentsProposals} />
+            <>
+              <div className="space-y-8 w-full">
+                <CommentProposalsComponent
+                  commentsProposals={commentsProposals}
+                />
 
-              <div className="w-full flex flex-row space-x-8">
-                <div className="w-full">
-                  <KeywordsChoose unipileId={unipile_id} kw={keywords} />{" "}
-                  <AccountsChoose />
+                <div className="w-full flex flex-row space-x-8">
+                  <div className="w-full">
+                    <KeywordsChoose unipileId={unipile_id} kw={keywords} />{" "}
+                    <AccountsChoose />
+                  </div>
+                  <YourTone />
                 </div>
-                <YourTone />
-              </div>
 
-              {/* Accounts Configuration */}
-            </div>
-          )}   <Separator />       <div className="w-full">
+                {/* Accounts Configuration */}
+              </div>
+              <Separator />{" "}
+            </>
+          )}{" "}
+          <div className="w-full">
             <LinkedInAccountCard unipileId={unipile_id} />
           </div>
         </div>

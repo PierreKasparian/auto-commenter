@@ -45,7 +45,14 @@ export function LinkedInTokenInfoDialog({ open, onOpenChange }: LinkedInTokenInf
               <li>In the Linkedin cookies find the &apos;li_at&apos; cookie</li>
               <li>Copy the value of the &apos;li_at&apos; cookie</li>
             </ul>
-          </div>
+          </div><Separator />
+
+<div className="space-y-2">
+
+  <p className="list-disc list-inside text-sm text-muted-foreground pl-2">
+    I am reachable at ia.school.app@gmail.com
+  </p>
+</div>
 
         </div>
 

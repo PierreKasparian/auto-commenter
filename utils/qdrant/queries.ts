@@ -11,8 +11,9 @@ const client = new QdrantClient({
 export async function retrieveQdrantCom(vectorSearch?: {
   queryVector: number[];
   limit?: number;
+  unipile_id?:string
 }) {
-  const unipile_id = await getUnipileId();
+  const unipileId = vectorSearch?.unipile_id ?? await getUnipileId();
   let results;
   if (vectorSearch) {
     results = await client.search("comment_history", {
@@ -24,12 +25,13 @@ export async function retrieveQdrantCom(vectorSearch?: {
         must: [
           {
             key: "unipile_id",
-            match: { value: unipile_id },
+            match: { value: unipileId },
           },
         ],
       },
     });
-    return results;
+    const commentList:string[] = results.map(result => result.payload?.comment) as string[];
+    return commentList;
   } else {
     results = await client.scroll("comment_history", {
       limit: 500, // Nombre maximum de points à récupérer
@@ -38,7 +40,7 @@ export async function retrieveQdrantCom(vectorSearch?: {
         must: [
           {
             key: "unipile_id",
-            match: { value: unipile_id },
+            match: { value: unipileId },
           },
         ],
       },
@@ -47,7 +49,7 @@ export async function retrieveQdrantCom(vectorSearch?: {
   return results;
 }
 
-async function vectorize(text: string) {
+export async function vectorize(text: string) {
   const response = await fetch("https://api.openai.com/v1/embeddings", {
     method: "POST",
     headers: {

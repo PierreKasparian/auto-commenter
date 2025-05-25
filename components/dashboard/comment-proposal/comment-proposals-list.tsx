@@ -30,7 +30,7 @@ export async function CommentProposalsList({commentsProposals}: {commentsProposa
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No pending comment proposals</h3>
           <p className="text-gray-500">
-            We&apos;ll notify you when new LinkedIn posts match your keywords and generate comment suggestions.
+            Your comments proposals will appear here. Select options below to begin matching posts and generating comments.
           </p>
         </div>
       </div>

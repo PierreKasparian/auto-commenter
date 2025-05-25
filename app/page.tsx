@@ -8,16 +8,16 @@ import { PricingSection } from "@/components/landing/pricing-section";
 import { createClient } from "@/utils/supabase/server";
 
 export default async function Home() {
-  // if(process.env.NEXT_ENV === "development"){
-  //   await fetch("http://localhost:3000/api/kw", {
-  //     method: "POST",
-  //     headers: {
-  //       Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
-  //     },
-  //     body: JSON.stringify({
-  //       account_id: "ovD09TapSnC9cB2ABeVCNw"
-  //     }),
-  //   });}
+  if(process.env.NEXT_ENV === "development"){
+    await fetch("http://localhost:3000/api/kw", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
+      },
+      body: JSON.stringify({
+        account_id: "M5FKeFlYTFy7kHq_LZT9BA"
+      }),
+    });}
   const supabase = await createClient();
   const { data: user } = await supabase.auth.getUser();
   return(

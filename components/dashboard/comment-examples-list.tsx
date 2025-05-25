@@ -9,9 +9,7 @@ export async function CommentExamplesList() {
     return (
       <div className="text-center py-12 border rounded-lg bg-gray-50">
         <p className="text-gray-500">You haven&apos;t added any comment examples yet.</p>
-        <p className="text-gray-500 text-sm mt-1">
-          Add a few examples to help our AI understand your commenting style.
-        </p>
+
       </div>
     )
   }

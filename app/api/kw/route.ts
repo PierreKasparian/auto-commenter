@@ -1,29 +1,64 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { Groq } from "groq-sdk";
+import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
+import { OpenAI } from "openai";
 // import { LinkedInPost } from "@/types";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
-const groq = new Groq();
-async function generateComment(post: string) {
-  const chatCompletion = await groq.chat.completions.create({
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+async function generateComment(post: string, unipile_id: string) {
+  const exampleCom = (await retrieveQdrantCom({
+    queryVector: await vectorize(post),
+    limit: 5,
+    unipile_id,
+  })) as string[];
+  console.log(
+    "prompt",
+    `Draft a LinkedIn comment that aligns with the tone of the original post and the given examples while focusing on achievements and collaborative efforts.\n\n- Respect the tone and style shown in example comments.\n- Acknowledge accomplishments and collaboration.\n- Be enthusiastic, supportive, and engaging.\n\n# Steps\n\n1. Review the post for themes of collaboration, achievements, and innovation.\n2. Observe tone and style in example comments.\n3. Generate an enthusiastic and supportive comment in the same language as the post.\n\n# Output Format\n\n- A single, engaging LinkedIn comment that aligns with the examples.\n- Must be in the same language as the post.\n- Limit to one or two sentences for conciseness.\n\n# Notes\n\n- Ensure the comment feels authentic and fits naturally in a LinkedIn context.\n- Use positive language that matches the post's tone and celebrates collective success. \n\n# Examples\n\n- ${exampleCom.join(
+      "\n- "
+    )}`
+  );
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4.1",
     messages: [
       {
+        role: "system",
+        content: [
+          {
+            type: "text",
+            text: `Draft a LinkedIn comment that aligns with the tone of the original post and the given examples while focusing on achievements and collaborative efforts.\n\n- Respect the tone and style shown in example comments.\n- Acknowledge accomplishments and collaboration.\n- Be enthusiastic, supportive, and engaging.\n\n# Steps\n\n1. Review the post for themes of collaboration, achievements, and innovation.\n2. Observe tone and style in example comments.\n3. Generate an enthusiastic and supportive comment in the same language as the post.\n\n# Output Format\n\n- A single, engaging LinkedIn comment that aligns with the examples.\n- Must be in the same language as the post.\n- Limit to one or two sentences for conciseness.\n\n# Notes\n\n- Ensure the comment feels authentic and fits naturally in a LinkedIn context.\n- Use positive language that matches the post's tone and celebrates collective success. \n\n# Examples\n\n- ${exampleCom.join(
+              "\n- "
+            )}`,
+          },
+        ],
+      },
+      {
         role: "user",
-        content: "Comment this post, make it short !:\n" + post,
+        content: [
+          {
+            type: "text",
+            text: '## Post to Comment On: \n"' + post + '"',
+          },
+        ],
       },
     ],
-    model: "meta-llama/llama-4-scout-17b-16e-instruct",
+    response_format: {
+      type: "text",
+    },
     temperature: 1,
+    max_completion_tokens: 2048,
     top_p: 1,
+    frequency_penalty: 0,
+    presence_penalty: 0,
     stream: false,
-    stop: null,
   });
 
-  return chatCompletion.choices[0]?.message.content;
+  return response.choices[0]?.message.content;
 }
 
 async function createComment(
@@ -33,7 +68,7 @@ async function createComment(
   author_name: string,
   post_id: string
 ) {
-  const comment = await generateComment(post);
+  const comment = await generateComment(post, account_id);
   const { error } = await supabase.from("comment_proposal").insert({
     unipile_id: account_id,
     post_text: post,
@@ -42,8 +77,8 @@ async function createComment(
     author_name: author_name,
     post_id: post_id,
   });
-  if (error) return {error:error};
-  return {error:null};
+  if (error) return { error: error };
+  return { error: null };
 }
 
 export const maxDuration = 60;
@@ -123,17 +158,18 @@ export async function POST(req: Request) {
   let n_commments = 0;
   for (const post of posts.items) {
     if (
-      (Number(post.date.slice(0, -1)) <= 12 || post.date.slice(-1) === "m") &&
+      ((Number(post.date.slice(0, -1)) <= 12 && post.date.slice(-1) === "h") ||
+        post.date.slice(-1) === "m") &&
       n_commments <
         Number(
           (
             keywords.unipile_id as unknown as {
               com_per_day_max: number;
             }
-          ).com_per_day_max &&
-            post.text.length > 100 &&
-            post.permissions.can_post_comments
-        )
+          ).com_per_day_max
+        ) &&
+      post.text.length > 100 &&
+      post.permissions.can_post_comments
       //  && keywords.keywords.some((el: string) =>
       //   post.text.split(/[\s.,;!?]+/).includes(el)
       // )
@@ -147,7 +183,7 @@ export async function POST(req: Request) {
         post.social_id
       );
       if (!response.error) n_commments++;
-      console.log(response)
+      console.log(response);
     }
   }
 

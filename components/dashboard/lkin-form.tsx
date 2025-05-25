@@ -10,11 +10,13 @@ import { useState } from "react"
 export function LinkedInConnectForm() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [accessToken, setAccessToken] = useState("")
-  const handleSubmit = (e: React.FormEvent) => {
+    const [formSubmitted,isFormSubmitted] = useState<boolean>(false)
+  const handleSubmit = async (e: React.FormEvent) => {
+    isFormSubmitted(true)
     e.preventDefault()
     const userAgent = navigator.userAgent;
-    console.log(userAgent)
-    linkedinConnect(accessToken, userAgent)
+    await linkedinConnect(accessToken, userAgent)
+    isFormSubmitted(false)
   }
 
   return (
@@ -47,8 +49,8 @@ export function LinkedInConnectForm() {
             Your token is stored securely and is only used for authorized actions.
           </p>
         </div>
-        <Button type="submit" className="w-full bg-[#0A66C2] hover:bg-[#004182]" disabled={!accessToken.trim()}>
-          Connect my LinkedIn account
+        <Button type="submit" className="w-full bg-[#0A66C2] hover:bg-[#004182]" disabled={!accessToken.trim() || formSubmitted}>
+          {formSubmitted ? "Connecting..." : "Connect my LinkedIn account"}
         </Button>
       </form>
 
