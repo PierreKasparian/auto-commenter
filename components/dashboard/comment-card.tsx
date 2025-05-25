@@ -3,8 +3,7 @@
 import { useState } from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import type { CommentVectorSearch, QdrantSearchResult } from "@/types"
-import { AllComments } from "@/types"
+import type { QdrantSearchResult } from "@/types"
 
 interface CommentCardProps {
   example: QdrantSearchResult

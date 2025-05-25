@@ -135,11 +135,9 @@ export async function acceptComment(
 ) {
   const unipileId = unipile_id || (await getUnipileId());
   if (unipileId && (await qdrantSavePost(post, comment, unipileId)).success) {
-    const res = await delCommentProposal(id);
-    if (!res.error) {
-      // await postComment(post_id,comment,unipileId);
-      redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
-    }
+    await delCommentProposal(id);
+    await postComment(post_id,comment,unipileId);
+    redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
   }
   redirect(getErrorRedirect("/dashboard", "Failed to accept comment"));
 }

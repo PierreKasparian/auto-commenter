@@ -8,6 +8,8 @@ import type { CommentProposal } from "@/types"
 import { Textarea } from "@/components/ui/textarea"
 import { delCommentProposal } from "@/utils/supabase/queries"
 import { acceptComment } from "@/utils/qdrant/queries"
+import { redirectToPath } from "@/utils/supabase/server"
+import { getStatusRedirect } from "@/utils/helpers"
 
 interface CommentProposalCardProps {
   proposal: CommentProposal
@@ -39,7 +41,7 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
       setIsProcessing(true)
       setActionType("reject")
       await delCommentProposal(proposal.id)
-
+      redirectToPath(getStatusRedirect('/dashboard',"Success ! 🎉", "Your comment has been successfully rejected"));
     } catch (error) {
       console.error("Failed to reject comment:", error)
 

@@ -2,8 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LinkedInConnectForm } from "./lkin-form"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { LogOut, Linkedin } from 'lucide-react'
+import { Linkedin } from 'lucide-react'
 
 
 export function LinkedInAccountCard({unipileId}: {unipileId: string | null}) {
@@ -35,10 +34,10 @@ export function LinkedInAccountCard({unipileId}: {unipileId: string | null}) {
                 <p className="text-sm text-muted-foreground">You can disconnect when you want</p>
               </div>
             </div>
-            <Button variant="outline" size="sm" >
+            {/* <Button variant="outline" size="sm" >
               <LogOut className="h-4 w-4 mr-2" />
               Disconnect
-            </Button>
+            </Button> */}
           </div>
         ) : (
           <LinkedInConnectForm />

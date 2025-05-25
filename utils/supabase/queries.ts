@@ -226,5 +226,7 @@ export async function getCommentsProposals(id?: string){
 export async function delCommentProposal(id:string){
   const supabase = await createClient();
   const { error } = await supabase.from("comment_proposal").delete().eq("id",id);
-  return {error:error}
+  if (error){
+    redirect(getErrorRedirect('/dashboard','Erreur,',error.message))
+  }
 }
