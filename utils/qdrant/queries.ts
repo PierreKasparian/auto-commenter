@@ -106,7 +106,7 @@ export async function qdrantDelPost(id: number | string) {
 async function postComment(post_id:string,comment:string,unipile_id?:string){
   const unipileId = unipile_id || (await getUnipileId());
   const myHeaders = new Headers();
-  myHeaders.append("X-API-KEY", "1JEm4iqR.l2WOiZZ+iCFM00ttyLs4zNc8QCVXFgp6ZRkM/69L0OI=");
+  myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
   
@@ -122,7 +122,7 @@ async function postComment(post_id:string,comment:string,unipile_id?:string){
     redirect: "follow"
   };
   
-  await fetch("https://api12.unipile.com:14269/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
+  await fetch("https://api3.unipile.com:13349/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
     .then((response) => response.text())
     .then((result) => console.log(result))
     .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));

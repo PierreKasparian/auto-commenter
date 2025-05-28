@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
@@ -42,7 +44,7 @@ async function generateComment(post: string, unipile_id: string) {
         content: [
           {
             type: "text",
-            text: '## Post to Comment On: \n"' + post + '"',
+            text: '## Post to Comment On (USING THE SAME LANGUAGE AS THE POST) : \n"' + post + '"',
           },
         ],
       },
@@ -81,9 +83,6 @@ async function createComment(
   return { error: null };
 }
 
-export const maxDuration = 60;
-export const dynamic = "force-dynamic";
-
 export async function POST(req: Request) {
   const body = await req.json();
   console.log(body);
@@ -102,6 +101,7 @@ export async function POST(req: Request) {
 
   console.log(keywords);
   if (keywordsError) {
+    console.log('kw err')
     console.log(keywordsError);
   }
   if (!keywords) return;
@@ -109,7 +109,7 @@ export async function POST(req: Request) {
   const myHeaders = new Headers();
   myHeaders.append(
     "X-API-KEY",
-    "1JEm4iqR.l2WOiZZ+iCFM00ttyLs4zNc8QCVXFgp6ZRkM/69L0OI="
+    process.env.UNIPILE_API_KEY!
   );
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
@@ -131,12 +131,15 @@ export async function POST(req: Request) {
     body: raw,
     redirect: "follow",
   };
-
+  console.log(JSON.stringify(requestOptions))
   const posts = await fetch(
-    `https://api12.unipile.com:14269/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
+    `https://api3.unipile.com:13349/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
     requestOptions as RequestInit
   )
-    .then((response) => response.json())
+    .then((response) => {
+      console.log(response)
+      return response.json()
+    })
     .catch((error) => console.error(error));
 
   //   //comment long

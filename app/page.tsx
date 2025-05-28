@@ -15,7 +15,7 @@ export default async function Home() {
         Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
       },
       body: JSON.stringify({
-        account_id: "M5FKeFlYTFy7kHq_LZT9BA"
+        account_id: "XSa0OZUISp-XvvZCmdCpog"
       }),
     });}
   const supabase = await createClient();

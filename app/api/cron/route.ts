@@ -1,3 +1,4 @@
+export const maxDuration = 60; // This function can run for a maximum of 5 seconds
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createClient, PostgrestError } from "@supabase/supabase-js";
@@ -75,7 +76,7 @@ export async function GET(req: Request) {
   };
 
   const accounts = await fetch(
-    "https://api12.unipile.com:14269/api/v1/accounts",
+    "https://api3.unipile.com:13349/api/v1/accounts",
     requestOptions as RequestInit
   )
     .then((response) => {
