@@ -50,7 +50,6 @@ const generateRandomTime = (timezone: string) => {
   const timeofTimezone = time.getTime() + offsetMinutes * 60 * 1000;
   const randomTime = getRandomInt(3, 120) * 5 * 60 * 1000;
   // const randomTime = 0
-  console.log((timeofTimezone + randomTime).toString().slice(0, -5));
   return (timeofTimezone + randomTime).toString().slice(0, -5);
 };
 
@@ -122,10 +121,12 @@ export async function GET(req: Request) {
             {
               unipile_id: account.id,
               comment_time: formattedTime,
+              created_at: new Date().toISOString(),
             },
           ],
           {
             onConflict: "unipile_id",
+            ignoreDuplicates: false
           }
         );
 
