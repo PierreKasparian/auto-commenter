@@ -93,3 +93,5 @@ export interface CommentProposal{
     author_name: string;
     post_id: string;
 }[]
+
+export type CreditAmount = 10 | 20 | 90 | 180;

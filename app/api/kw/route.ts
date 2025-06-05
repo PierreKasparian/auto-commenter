@@ -133,7 +133,7 @@ export async function POST(req: Request) {
   };
   console.log(JSON.stringify(requestOptions))
   const posts = await fetch(
-    `https://api3.unipile.com:13349/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
+    `https://api10.unipile.com:14079/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
     requestOptions as RequestInit
   )
     .then((response) => {

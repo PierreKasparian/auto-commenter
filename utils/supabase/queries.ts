@@ -90,7 +90,7 @@ export async function getPostFromId(postId: string, unipileId: string) {
   };
 
   const post = await fetch(
-    "https://api3.unipile.com:13349/api/v1/posts/" +
+    "https://api10.unipile.com:14079/api/v1/posts/" +
       postId +
       "?account_id=" +
       unipileId,
@@ -114,7 +114,7 @@ async function getProviderId(unipile_id:string){
     redirect: "follow",
   };
   const provider_id = await fetch(
-    "https://api3.unipile.com:13349/api/v1/users/me?account_id=" + unipile_id,
+    "https://api10.unipile.com:14079/api/v1/users/me?account_id=" + unipile_id,
     requestOptions as RequestInit
   ).then((response) => response.json())
     .then((result) => {console.log(result);return result.provider_id})
@@ -139,7 +139,7 @@ export async function getUserComments(unipileId: string,provider_id:string) {
   };
 
   const comments = await fetch(
-    `https://api3.unipile.com:13349/api/v1/users/${provider_id}/comments?account_id=${unipileId}`,
+    `https://api10.unipile.com:14079/api/v1/users/${provider_id}/comments?account_id=${unipileId}`,
     comRequestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -158,7 +158,7 @@ const requestOptions = {
   redirect: "follow"
 };
 
-const response = await fetch("https://api3.unipile.com:13349/api/v1/users/"+provider_id+"?account_id="+unipileId, requestOptions as RequestInit)
+const response = await fetch("https://api10.unipile.com:14079/api/v1/users/"+provider_id+"?account_id="+unipileId, requestOptions as RequestInit)
 const result = await response.json()
 console.log(result)
 return result.headline
@@ -184,7 +184,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   };
 
   const response = await fetch(
-    "https://api3.unipile.com:13349/api/v1/accounts",
+    "https://api10.unipile.com:14079/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
   await new Promise(resolve => setTimeout(resolve, 10000));

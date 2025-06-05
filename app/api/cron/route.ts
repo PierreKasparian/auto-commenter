@@ -75,7 +75,7 @@ export async function GET(req: Request) {
   };
 
   const accounts = await fetch(
-    "https://api3.unipile.com:13349/api/v1/accounts",
+    "https://api10.unipile.com:14079/api/v1/accounts",
     requestOptions as RequestInit
   )
     .then((response) => {

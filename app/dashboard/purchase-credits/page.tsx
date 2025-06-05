@@ -1,16 +1,7 @@
 import { createClient } from "@/utils/supabase/server";
 import React from "react";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Check, Sparkles, Zap } from "lucide-react";
-import BuyButton from "@/components/dashboard/BuyButton";
+
 import { redirect } from "next/navigation";
 import { Navbar } from "@/components/landing/navbar";
 import { PricingSection } from "@/components/landing/pricing-section";
@@ -109,7 +100,7 @@ const page = async () => {
               </CardFooter>
             </Card>
           </div> */}
-          <PricingSection />
+          <PricingSection isDashboard={true} />
 
           <div className="text-center mt-12">
             <p className="text-sm text-gray-500">

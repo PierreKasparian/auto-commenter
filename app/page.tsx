@@ -24,9 +24,9 @@ export default async function Home() {
     //   headers: {
     //     Authorization: `Bearer ${process.env.CRON_SECRET}`,
     //   },
-      // body: JSON.stringify({
-      //   account_id: "XSa0OZUISp-XvvZCmdCpog"
-      // }),
+    //   // body: JSON.stringify({
+    //   //   account_id: "XSa0OZUISp-XvvZCmdCpog"
+    //   // }),
     // });
   }
   const supabase = await createClient();
