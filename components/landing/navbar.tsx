@@ -77,6 +77,12 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
               >
                 Buy credits
               </Link>
+              <Link
+                href="/dashboard/account"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Account
+              </Link>
               <Button
                 variant="outline"
                 className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50"
@@ -125,6 +131,13 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
                   onClick={() => setIsMenuOpen(false)}
                 >
                   Buy credits
+                </Link>
+                <Link
+                  href="/dashboard/account"
+                  className="block text-gray-600 hover:text-teal-600 transition-colors"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Account
                 </Link>
                 <div className="pt-4 space-y-3">
                   <Button

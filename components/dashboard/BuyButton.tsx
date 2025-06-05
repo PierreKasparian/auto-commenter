@@ -3,11 +3,12 @@ import React from "react";
 import type { ClassValue } from "clsx";
 import { Button } from "@/components/ui/button";
 import { CreditCard } from "lucide-react";
-// import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/utils/supabase/client";
 import { loadStripe } from "@stripe/stripe-js";
 import { CreditAmount } from "@/types";
 import { redirectToPath } from "@/utils/supabase/server";
 import { getErrorRedirect } from "@/utils/helpers";
+import { getUnipileId } from "@/utils/supabase/queries";
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLIC_KEY!);
 
 
@@ -23,12 +24,17 @@ const BuyButton = ({ credits,className }: { credits: CreditAmount,className?:Cla
 
 
   const handleClick = async () => {
+    if (!(await getUnipileId())){
+      redirectToPath(getErrorRedirect("/dashboard","You need to connect to your linkedin account to buy credits"))
+      return;
+    }
     console.log("tarif",process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_10_ID)
     console.log(priceMap[credits])
     const stripe = await stripePromise;
 
-    // const supabase = await createClient();
-    // const user = await supabase.auth.getUser();
+    const supabase = await createClient();
+    const user = await supabase.auth.getUser();
+    //si l'utilisateur n'est pas co a son linkedin on le renvoie au dashboard
     const { sessionId } = await fetch(
       `/api/stripe/checkout`,
       {
@@ -36,7 +42,7 @@ const BuyButton = ({ credits,className }: { credits: CreditAmount,className?:Cla
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ priceId :priceMap[credits] }),
+        body: JSON.stringify({ priceId :priceMap[credits],user_id:user.data.user?.id }),
       }
     ).then(res => res.json());
     const result = await stripe?.redirectToCheckout({ sessionId });

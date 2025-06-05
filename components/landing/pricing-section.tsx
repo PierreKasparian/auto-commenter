@@ -19,7 +19,7 @@ export function PricingSection({ isDashboard }: { isDashboard?: boolean }) {
       monthlyPrice: 10,
       annualPrice: 90,
       features: [
-        "50 automatic comments per month",
+        "10 automatic comments per day",
         "5 custom keywords",
         "3 profiles to follow",
         // "Manual comment validation",
@@ -35,7 +35,7 @@ export function PricingSection({ isDashboard }: { isDashboard?: boolean }) {
       monthlyPrice: 20,
       annualPrice: 180,
       features: [
-        "200 automatic comments per month",
+        "25 automatic comments per day",
         "20 custom keywords",
         "15 profiles to follow",
         // "Manual or automatic comment validation",
@@ -103,7 +103,7 @@ export function PricingSection({ isDashboard }: { isDashboard?: boolean }) {
               className={`ml-2 ${isAnnual ? "text-gray-900" : "text-gray-500"}`}
             >
               Annually{" "}
-              <span className="text-teal-600 font-medium">(2 months free)</span>
+              <span className="text-teal-600 font-medium">(3 months free)</span>
             </Label>
           </div>
         </motion.div>

@@ -5,7 +5,7 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_TEST_SECRET_KEY!);
 
 export async function POST(request: Request) {
-  const { priceId } = await request.json();
+  const { priceId,user_id } = await request.json();
   // console.log(priceId)
   try {
     const successUrl = getStatusRedirect("/dashboard","Success","Subscription successful");
@@ -20,6 +20,9 @@ export async function POST(request: Request) {
           quantity: 1,
         },
       ],
+      metadata: {
+        user_id: user_id,
+      },
       success_url: `${request.headers.get('origin')}${successUrl}`,
       cancel_url: `${request.headers.get('origin')}${cancelUrl}`,
     });
