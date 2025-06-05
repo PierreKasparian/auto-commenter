@@ -122,6 +122,7 @@ export async function GET(req: Request) {
               unipile_id: account.id,
               comment_time: formattedTime,
               created_at: new Date().toISOString(),
+              done:false
             },
           ],
           {

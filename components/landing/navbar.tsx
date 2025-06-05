@@ -72,7 +72,7 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
                 Dashboard
               </Link>
               <Link
-                href="/dashboard/buy"
+                href="/dashboard/purchase-credits"
                 className="text-gray-600 hover:text-teal-600 transition-colors"
               >
                 Buy credits
@@ -120,7 +120,7 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
                   Dashboard
                 </Link>
                 <Link
-                  href="/dashboard/buy"
+                  href="/dashboard/purchase-credits"
                   className="block text-gray-600 hover:text-teal-600 transition-colors"
                   onClick={() => setIsMenuOpen(false)}
                 >
