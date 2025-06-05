@@ -3,7 +3,7 @@ import React from "react";
 import type { ClassValue } from "clsx";
 import { Button } from "@/components/ui/button";
 import { CreditCard } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+// import { createClient } from "@/utils/supabase/client";
 import { loadStripe } from "@stripe/stripe-js";
 import { CreditAmount } from "@/types";
 import { redirectToPath } from "@/utils/supabase/server";
