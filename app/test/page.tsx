@@ -1,7 +1,12 @@
-import React from "react";
+// import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
+// import React from "react";
+// import { OpenAI } from "openai";
 // import { createClient } from "@/utils/supabase/server";
-// 
+//
+// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
 const page = async () => {
+//  const res =await generateComment()
   // const supabase = await createClient();
   // const { data,error: upsertError } = await supabase
   //       .from("comment_time")
@@ -19,7 +24,7 @@ const page = async () => {
   //         }
   //       ).select();
   //       console.log(upsertError)
-  return <div>{/*JSON.stringify(data)*/}</div>;
+  return <div>res</div>;
 };
 
 export default page;

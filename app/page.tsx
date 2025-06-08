@@ -15,7 +15,7 @@ export default async function Home() {
     //     Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
     //   },
     //   body: JSON.stringify({
-    //     account_id: "XSa0OZUISp-XvvZCmdCpog"
+    //     account_id: "xH9knahXS82M36FODsMr7Q"
     //   }),
     // });
   // }

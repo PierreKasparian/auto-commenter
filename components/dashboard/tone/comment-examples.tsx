@@ -1,17 +1,23 @@
 import { Suspense } from "react"
 import { CommentExamplesList } from "./comment-examples-list"
 import { AddCommentForm } from "./add-comment-form"
+import ProfileDescriptionForm from "./profile-desc-form"
+import { getProfileDescription } from "@/utils/supabase/queries"
 
 
 
-export default function YourTone() {
+export default async function YourTone() {
+  const profileDescription = await getProfileDescription()
+
   return (
     <div className="w-full max-w-4xl mx-auto bg-white rounded-xl shadow-sm border overflow-hidden">
       <div className="p-6 border-b">
         <h2 className="text-lg font-semibold text-black">Your comment tone</h2>
         <p className="text-muted-foreground">Add examples of comments you&apos;ve made to help our AI match your tone and style</p>
       </div>
-
+<div className="">
+  <ProfileDescriptionForm profileDesc={profileDescription} />
+</div>
       <div className="p-6">
         <AddCommentForm />
 

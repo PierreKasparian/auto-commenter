@@ -39,7 +39,7 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg font-semibold text-black">LinkedIn Keyword Automation</CardTitle>
-        <CardDescription>Choose keywords that trigger automatic comments on LinkedIn posts</CardDescription>
+        <CardDescription>Select keywords that will automatically trigger comments on LinkedIn posts published within the last 24 hours.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex space-x-2">
@@ -80,7 +80,7 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
 
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Reset</Button>
+        <Button variant="outline" onClick={() => setKeywords([])}>Reset</Button>
         <Button type="button" onClick={() => saveKeywords(keywords, unipileId)}>Save Configuration</Button>
       </CardFooter>
     </Card>

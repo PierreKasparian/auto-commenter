@@ -3,6 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { getErrorRedirect, getStatusRedirect } from "../helpers";
 import { qdrantSavePost } from "../qdrant/queries";
+import { FormEvent } from "react";
 
 export async function signOut() {
   const supabase = await createClient();
@@ -266,4 +267,55 @@ export async function delCommentProposal(id: string) {
   if (error) {
     redirect(getErrorRedirect("/dashboard", "Erreur,", error.message));
   }
+}
+
+
+export const getProfileDescription = async () => {
+  const supabase = await createClient();
+  const { data: user } = await supabase.auth.getUser();
+  const user_id = user?.user?.id;
+  const { data, error } = await supabase
+    .from("unipile_id")
+    .select("profile_description")
+    .eq("user_id", user_id)
+    .single();
+  if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
+  return data?.profile_description;
+}
+
+export const editProfileDescription = async (profileDescription : string)=>{
+  const supabase = await createClient();
+  const { data: user } = await supabase.auth.getUser();
+  const user_id = user?.user?.id;
+  const { error } = await supabase
+    .from("unipile_id")
+    .update({ profile_description: profileDescription })
+    .eq("user_id", user_id)
+    .single();
+  if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
+  redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your profile description has been successfully updated"));
+}
+
+export const getLanguages = async () => {
+  const supabase = await createClient();
+  const { data: user } = await supabase.auth.getUser();
+  const user_id = user?.user?.id;
+  const { data, error } = await supabase
+    .from("unipile_id")
+    .select("langues")
+    .eq("user_id", user_id)
+    .single();
+  if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
+  return data?.langues;
+}
+
+export const saveLanguages = async (languages : string[],unipileId : string)=>{
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("unipile_id")
+    .update({ langues: languages })
+    .eq("unipile_id", unipileId)
+    .single();
+  if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
+  redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your languages have been successfully updated"));
 }

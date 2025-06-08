@@ -154,13 +154,12 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
                 >
                   Buy credits
                 </Link>
-                <Link
-                  href="/dashboard/account"
+                <button
                   className="block text-gray-600 hover:text-teal-600 transition-colors"
-                  onClick={() => setIsMenuOpen(false)}
+                  onClick={handleManageSubscription}
                 >
-                  Account
-                </Link>
+                  Manage subscription
+                </button>
                 <div className="pt-4 space-y-3">
                   <Button
                     variant="outline"
