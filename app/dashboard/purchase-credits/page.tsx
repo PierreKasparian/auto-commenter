@@ -3,7 +3,7 @@ import React from "react";
 import Link from "next/link";
 
 import { redirect } from "next/navigation";
-import { Navbar } from "@/components/landing/navbar";
+import { Navbar } from "@/components/navbar";
 import { PricingSection } from "@/components/landing/pricing-section";
 const page = async () => {
   const supabase = await createClient();

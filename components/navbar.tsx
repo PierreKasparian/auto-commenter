@@ -6,10 +6,25 @@ import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { signOut } from "@/utils/supabase/queries";
+import { redirectToPath } from "@/utils/supabase/server";
+import { createClient } from "@/utils/supabase/client";
 
 export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const handleManageSubscription = async () => {
+    const supabase = await createClient();
+    const {data: user } = await supabase.auth.getUser();
+    try {
+      const response = await fetch('/api/stripe/create-portal-session', {
+        method: 'POST',
+        body: JSON.stringify({ user_id: user.user?.id }),
+      });
+      const { url } = await response.json();
+      redirectToPath(url);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <motion.header
       className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b"
@@ -77,12 +92,19 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
               >
                 Buy credits
               </Link>
-              <Link
+              <button
+                // variant="outline"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+                onClick={handleManageSubscription}
+              >
+                Manage subscription
+              </button>
+              {/* <Link
                 href="/dashboard/account"
                 className="text-gray-600 hover:text-teal-600 transition-colors"
               >
                 Account
-              </Link>
+              </Link> */}
               <Button
                 variant="outline"
                 className="border-teal-600 text-teal-600 bg-white hover:bg-teal-50"

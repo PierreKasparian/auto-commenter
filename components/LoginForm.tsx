@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { login, signup } from "@/app/(auth)/login/action";
 import { redirectToPath } from "@/utils/supabase/server";
 import { getErrorRedirect } from "@/utils/helpers";
-import { Navbar } from "./landing/navbar";
+import { Navbar } from "./navbar";
 export default function LoginForm() {
   const [activeTab, setActiveTab] = useState("login");
   const [isSubmitted, setIsSubmitted] = useState(false);

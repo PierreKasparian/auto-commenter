@@ -5,7 +5,7 @@ import AccountsChoose from "@/components/dashboard/accounts-choose";
 import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card";
 import { getUnipileId } from "@/utils/supabase/queries";
 import { getKeywords } from "@/utils/supabase/queries";
-import { Navbar } from "@/components/landing/navbar";
+import { Navbar } from "@/components/navbar";
 import YourTone from "@/components/dashboard/comment-examples";
 import CommentProposalsComponent from "@/components/dashboard/comment-proposal/comment-proposals";
 import { getCommentsProposals } from "@/utils/supabase/queries";
