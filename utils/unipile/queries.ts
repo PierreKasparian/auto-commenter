@@ -1,5 +1,5 @@
+export { maxDuration } from "./route-config";
 "use server";
-export const maxDuration = 60;
 import { redirect } from "next/navigation";
 import { getErrorRedirect, getStatusRedirect } from "../helpers";
 import { qdrantSavePost } from "../qdrant/queries";
