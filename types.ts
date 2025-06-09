@@ -93,6 +93,11 @@ export interface CommentProposal{
     comment_IA: string;
     author_name: string;
     post_id: string;
+    unipile_id:{
+        user_timezone:{
+            timezone:string
+        }
+    }
 }[]
 
 export type CreditAmount = 10 | 20 | 90 | 180;

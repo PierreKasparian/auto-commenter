@@ -1,8 +1,4 @@
-// import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
-// import React from "react";
-// import { OpenAI } from "openai";
-// import { createClient } from "@/utils/supabase/server";
-//
+
 // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 // import { sendMail } from "@/utils/helpers";
 // import nodemailer from "nodemailer";
@@ -17,7 +13,12 @@ const page = async () => {
 //  co     console.log(upsertError)
 
 // create reusable transporter object using the default SMTP transport
+// const supabase = await createClient();
 
+// const { data: post_time, error: error_time } = await supabase.from('comment_proposal').select('*').not("post_time", "is", null);
+
+  // console.log(JSON.stringify(post_time))
+  // console.log(error_time)
   return <div>res</div>;
 };
 

@@ -1,7 +1,7 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { getErrorRedirect, getStatusRedirect } from "../helpers";
+import { getErrorRedirect, getRandomPostTime, getStatusRedirect } from "../helpers";
 
 
 export async function signOut() {
@@ -82,7 +82,7 @@ export async function getCommentsProposals(id?: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("comment_proposal")
-    .select("id,created_at,post_text,post_link,comment_IA,author_name,post_id")
+    .select("id,created_at,post_text,post_link,comment_IA,author_name,post_id,unipile_id(user_timezone(timezone))")
     .eq("unipile_id", unipile_id);
   if (error) console.log(error);
   return data;
@@ -148,4 +148,21 @@ export const saveLanguages = async (languages : string[],unipileId : string)=>{
     .single();
   if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
   redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your languages have been successfully updated"));
+}
+
+export async function acceptComment(
+  id: string,
+  timezone:string,
+  unipile_id?: string
+) {
+  console.log(timezone)
+  const unipileId = unipile_id || (await getUnipileId());
+  if (unipileId) {
+    const supabase = await createClient();
+    const postTime = getRandomPostTime(timezone)
+    const {error} = await supabase.from('comment_proposal').update({post_time:postTime}).eq('id',id)
+    if(error) redirect(getErrorRedirect("/dashboard", "Failed to accept comment", error.message));
+    redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
+  }
+  redirect(getErrorRedirect("/dashboard", "Failed to accept comment"));
 }

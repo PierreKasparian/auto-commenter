@@ -245,3 +245,46 @@ export const isUnipileAccountConnected = async (unipile_id: string) => {
 export async function waitRandomTime(){
   await new Promise((resolve) => setTimeout(resolve, Math.random() * 50000));
 }
+
+export function getTimezoneOffsetInMinutes(
+  timeZone: string,
+  date: Date = new Date()
+): number {
+  const formatter = new Intl.DateTimeFormat("en-US", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
+  type DateParts = { [key: string]: string };
+
+  const parts: DateParts = formatter
+    .formatToParts(date)
+    .reduce((acc: DateParts, part) => {
+      if (part.type !== "literal" && part.value) {
+        acc[part.type] = part.value;
+      }
+      return acc;
+    }, {});
+
+  const isoString = `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}Z`;
+  const targetDate = new Date(isoString);
+
+  const offsetMs: number = targetDate.getTime() - date.getTime();
+  return Math.round(offsetMs / 60000); // offset in minutes
+}
+
+export const getRandomPostTime = (timezone: string) => {
+  const time = new Date();
+  const offsetMinutes = getTimezoneOffsetInMinutes(timezone);
+  const randomMinutes = (Math.floor(Math.random() * 3) + 1) * 5;
+  time.setMinutes(Math.ceil(time.getMinutes() + randomMinutes));
+  const timeofTimezone = time.getTime() + offsetMinutes * 60 * 1000;
+  return (timeofTimezone).toString().slice(0, -5);
+};
+  

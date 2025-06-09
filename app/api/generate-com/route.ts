@@ -239,7 +239,7 @@ Pierre`);
               }
             ).com_per_day_max
           ) &&
-        post.text.length > 100 &&
+        post.text.length > 300 &&
         post.permissions.can_post_comments &&
         //  && keywords.keywords.some((el: string) =>
         //   post.text.split(/[\s.,;!?]+/).includes(el)

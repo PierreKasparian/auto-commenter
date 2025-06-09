@@ -213,7 +213,7 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
   return result.url;
 };
 
-async function postComment(post_id:string,comment:string,unipile_id?:string){
+export async function postComment(post_id:string,comment:string,unipile_id?:string){
   const unipileId = unipile_id || (await getUnipileId());
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
@@ -236,20 +236,4 @@ async function postComment(post_id:string,comment:string,unipile_id?:string){
     .then((response) => response.text())
     .then((result) => console.log(result))
     .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
-}
-
-export async function acceptComment(
-  post: string,
-  comment: string,
-  id: string,
-  post_id: string,
-  unipile_id?: string
-) {
-  const unipileId = unipile_id || (await getUnipileId());
-  if (unipileId && (await qdrantSavePost(post, comment, unipileId)).success) {
-    await delCommentProposal(id);
-    postComment(post_id,comment,unipileId);
-    redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
-  }
-  redirect(getErrorRedirect("/dashboard", "Failed to accept comment"));
 }

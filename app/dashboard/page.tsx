@@ -14,13 +14,14 @@ import CommentProposalsComponent from "@/components/dashboard/comment-proposal/c
 import { getCommentsProposals } from "@/utils/supabase/queries";
 import LanguageChoose from "@/components/dashboard/language-choose";
 import { isUnipileAccountConnected } from "@/utils/helpers";
+import { CommentProposal } from "@/types";
 
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
   const isConnected = await isUnipileAccountConnected(unipile_id ?? "");
   const keywords = await getKeywords();
   const langues = await getLanguages();
-  const commentsProposals = await getCommentsProposals(unipile_id ?? undefined);
+  const commentsProposals = await getCommentsProposals(unipile_id ?? undefined) as unknown as CommentProposal[];
   return (
     <>
       <Navbar isDashboard={true} />

@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns"
 import type { CommentProposal } from "@/types"
 import { Textarea } from "@/components/ui/textarea"
 import { delCommentProposal } from "@/utils/supabase/queries"
-import { acceptComment } from "@/utils/unipile/queries"
+import { acceptComment } from "@/utils/supabase/queries"
 import { redirectToPath } from "@/utils/supabase/server"
 import { getStatusRedirect } from "@/utils/helpers"
 
@@ -25,7 +25,7 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
       setIsProcessing(true)
       setActionType("accept")
       console.log(commentIA)
-      await acceptComment(proposal.post_text,commentIA,proposal.id,proposal.post_id)
+      await acceptComment(proposal.id,proposal.unipile_id.user_timezone.timezone)
 
     } catch (error) {
       console.error("Failed to accept comment:", error)
