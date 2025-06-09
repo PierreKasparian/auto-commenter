@@ -87,6 +87,7 @@ export async function qdrantSavePost(
     wait: true,
   });
   if (!(res.status === "completed" || res.status === "acknowledged")) {
+    console.log('problemo')
     redirect(getErrorRedirect("/dashboard", "Failed to save post"));
   }
   return { success: true };

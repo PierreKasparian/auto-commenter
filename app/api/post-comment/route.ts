@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const { id, post_id, unipile_id, comment, post_text } = body;
+  console.log(id, post_id, unipile_id, comment, post_text )
   if (
     unipile_id &&
     (await qdrantSavePost(post_text, comment, unipile_id)).success
