@@ -1,3 +1,5 @@
+export const maxDuration = 60;
+
 import { getProviderId } from "./unipile/queries";
 
 const toastKeyMap: { [key: string]: string[] } = {
@@ -240,4 +242,6 @@ export const isUnipileAccountConnected = async (unipile_id: string) => {
   return true;
 };
 
-
+export async function waitRandomTime(){
+  await new Promise((resolve) => setTimeout(resolve, Math.random() * 50000));
+}

@@ -1,7 +1,6 @@
 "use server"
-export { maxDuration } from "./route-config";
 import { redirect } from "next/navigation";
-import { getErrorRedirect, getStatusRedirect } from "../helpers";
+import { getErrorRedirect, getStatusRedirect, waitRandomTime } from "../helpers";
 import { qdrantSavePost } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { delCommentProposal, getUnipileId } from "../supabase/queries";
@@ -232,7 +231,7 @@ async function postComment(post_id:string,comment:string,unipile_id?:string){
     body: raw,
     redirect: "follow"
   };
-  await new Promise((resolve) => setTimeout(resolve, Math.random() * 50000));
+  await waitRandomTime();
   await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
     .then((response) => response.text())
     .then((result) => console.log(result))
