@@ -1,4 +1,4 @@
-export const maxDuration = 180;
+export const maxDuration = 60;
 export const dynamic = 'force-dynamic';
 import React from "react";
 import { Separator } from "@/components/ui/separator";
