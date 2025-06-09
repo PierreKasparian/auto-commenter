@@ -1,5 +1,5 @@
+"use server"
 export { maxDuration } from "./route-config";
-"use server";
 import { redirect } from "next/navigation";
 import { getErrorRedirect, getStatusRedirect } from "../helpers";
 import { qdrantSavePost } from "../qdrant/queries";
