@@ -231,7 +231,7 @@ export async function postComment(post_id:string,comment:string,unipile_id?:stri
     body: raw,
     redirect: "follow"
   };
-  await new Promise((resolve) => setTimeout(resolve, Math.random() * 180000));
+  await new Promise((resolve) => setTimeout(resolve, 180000));//Math.random() * 180000));
   await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
     .then((response) => response.text())
     .then((result) => console.log(result))
