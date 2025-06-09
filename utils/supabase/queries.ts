@@ -2,6 +2,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 import { getErrorRedirect, getRandomPostTime, getStatusRedirect } from "../helpers";
+import { SupabaseClient } from "@supabase/supabase-js";
 
 
 export async function signOut() {
@@ -88,9 +89,9 @@ export async function getCommentsProposals(id?: string) {
   return data;
 }
 
-export async function delCommentProposal(id: string) {
-  const supabase = await createClient();
-  const { error } = await supabase
+export async function delCommentProposal(id: string,supabase?: SupabaseClient<any, "public", any>) {
+  const supabaseClient = supabase ?? await createClient();
+  const { error } = await supabaseClient
     .from("comment_proposal")
     .delete()
     .eq("id", id);
