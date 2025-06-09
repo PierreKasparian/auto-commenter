@@ -24,8 +24,11 @@ export async function POST(req: Request) {
     unipile_id &&
     (await qdrantSavePost(post_text, comment, unipile_id)).success
   ) {
+    console.log('comment saving..')
     await delCommentProposal(id,supabase);
+    console.log('comment deleted')
     postComment(post_id, comment, unipile_id);
+    console.log('comment posted')
   } else {
     return NextResponse.json({ error: "Invalid data" }, { status: 400 });
   }
