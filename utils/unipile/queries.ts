@@ -231,7 +231,8 @@ export async function postComment(post_id:string,comment:string,unipile_id?:stri
     body: raw,
     redirect: "follow"
   };
-  await waitRandomTime();
+  // await waitRandomTime();
+  console.log('comment close to posting..')
   await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
     .then((response) => response.text())
     .then((result) => console.log(result))

@@ -1,7 +1,7 @@
 "use server";
 import { QdrantClient } from "@qdrant/js-client-rest";
-import { delCommentProposal, getUnipileId } from "../supabase/queries";
-import { getErrorRedirect, getStatusRedirect } from "../helpers";
+import { getUnipileId } from "../supabase/queries";
+import { getErrorRedirect } from "../helpers";
 import { redirect } from "next/navigation";
 const client = new QdrantClient({
   url: process.env.QDRANT_CLUSTER_LINK!,

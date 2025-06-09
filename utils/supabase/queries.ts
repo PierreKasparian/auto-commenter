@@ -91,10 +91,13 @@ export async function getCommentsProposals(id?: string) {
 
 export async function delCommentProposal(id: string,supabase?: SupabaseClient<any, "public", any>) {
   const supabaseClient = supabase ?? await createClient();
-  const { error } = await supabaseClient
+  const { data,error } = await supabaseClient
     .from("comment_proposal")
     .delete()
-    .eq("id", id);
+    .eq("id", id)
+    .select();
+  console.log("delete data")
+  console.log(data)
   if (error) {
     redirect(getErrorRedirect("/dashboard", "Erreur,", error.message));
   }
