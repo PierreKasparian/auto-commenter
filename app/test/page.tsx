@@ -4,26 +4,20 @@
 // import { createClient } from "@/utils/supabase/server";
 //
 // const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+// import { sendMail } from "@/utils/helpers";
+// import nodemailer from "nodemailer";
 
 const page = async () => {
-//  const res =await generateComment()
-  // const supabase = await createClient();
-  // const { data,error: upsertError } = await supabase
-  //       .from("comment_time")
-  //       .upsert(
-  //         [
-  //           {
-  //             unipile_id: "XSa0OZUISp-XvvZCmdCpog",
-  //             comment_time: "17489627",
-  //             created_at: new Date().toISOString(),
-  //           },
-  //         ],
-  //         {
-  //           onConflict: "unipile_id",
-  //           ignoreDuplicates: false
-  //         }
-  //       ).select();
-  //       console.log(upsertError)
+//   sendMail("ia.school.app@gmail.com", "Auto commenter account problem", `Hey, 
+// There was a problem accessing to your Linkedin account to generate new comments. Please connect to https://auto-commenter.vercel.app/dashboard to fix the issue.
+
+// Best regards,
+// Pierre
+// `);
+//  co     console.log(upsertError)
+
+// create reusable transporter object using the default SMTP transport
+
   return <div>res</div>;
 };
 

@@ -1,13 +1,28 @@
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { LinkedInConnectForm } from "./lkin-form";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Linkedin } from "lucide-react";
+import { getUnipileReconnectUrl } from "@/utils/unipile/queries";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { LinkedInConnectForm } from "./lkin-form"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Linkedin } from 'lucide-react'
-
-
-export function LinkedInAccountCard({unipileId}: {unipileId: string | null}) {
-
-
+export async function LinkedInAccountCard({
+  unipileId,
+  isConnected,
+}: {
+  unipileId: string | null;
+  isConnected: boolean;
+}) {
+  let url;
+  if (!isConnected) {
+    url = await getUnipileReconnectUrl(unipileId!);
+  }
   return (
     <Card className="w-full">
       <CardHeader>
@@ -20,18 +35,23 @@ export function LinkedInAccountCard({unipileId}: {unipileId: string | null}) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        {unipileId ? (
+        {unipileId && isConnected ? (
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Avatar className="h-12 w-12 border">
                 <AvatarImage src={"/placeholder.svg"} alt={"LinkedIn"} />
                 <AvatarFallback className="bg-[#0A66C2] text-white">
-                  {"LinkedIn".split(" ").map(n => n[0]).join("")}
+                  {"LinkedIn"
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")}
                 </AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium">You&apos;re connected</p>
-                <p className="text-sm text-muted-foreground">You can disconnect when you want</p>
+                <p className="text-sm text-muted-foreground">
+                  You can disconnect when you want
+                </p>
               </div>
             </div>
             {/* <Button variant="outline" size="sm" >
@@ -39,10 +59,14 @@ export function LinkedInAccountCard({unipileId}: {unipileId: string | null}) {
               Disconnect
             </Button> */}
           </div>
-        ) : (
+        ) : !unipileId ? (
           <LinkedInConnectForm />
+        ) : (
+          <Link href={url}>
+            <Button>Reconnect</Button>
+          </Link>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

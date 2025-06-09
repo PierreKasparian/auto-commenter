@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import React from "react";
 import { Separator } from "@/components/ui/separator";
 import KeywordsChoose from "@/components/dashboard/kw-choose";
@@ -11,9 +12,11 @@ import YourTone from "@/components/dashboard/tone/comment-examples";
 import CommentProposalsComponent from "@/components/dashboard/comment-proposal/comment-proposals";
 import { getCommentsProposals } from "@/utils/supabase/queries";
 import LanguageChoose from "@/components/dashboard/language-choose";
+import { isUnipileAccountConnected } from "@/utils/helpers";
 
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
+  const isConnected = await isUnipileAccountConnected(unipile_id ?? "");
   const keywords = await getKeywords();
   const langues = await getLanguages();
   const commentsProposals = await getCommentsProposals(unipile_id ?? undefined);
@@ -33,7 +36,7 @@ const DashboardPage = async () => {
           </div>
           <Separator />
           {/* Configuration Section */}
-          {unipile_id && (
+          {unipile_id && isConnected && (
             <>
               <div className="space-y-8 w-full">
                 <CommentProposalsComponent
@@ -55,7 +58,7 @@ const DashboardPage = async () => {
             </>
           )}{" "}
           <div className="w-full">
-            <LinkedInAccountCard unipileId={unipile_id} />
+            <LinkedInAccountCard unipileId={unipile_id} isConnected={isConnected}/>
           </div>
         </div>
       </div>

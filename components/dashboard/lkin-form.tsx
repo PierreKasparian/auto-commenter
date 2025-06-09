@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Info } from "lucide-react"
 import { LinkedInTokenInfoDialog } from "./find-tok-dialog"
-import { linkedinConnect } from "@/utils/supabase/queries"
+import { linkedinConnect } from "@/utils/unipile/queries"
 import { useState } from "react"
 
 

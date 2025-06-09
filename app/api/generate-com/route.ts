@@ -1,12 +1,13 @@
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
-import DetectLanguage from 'detectlanguage';
+import DetectLanguage from "detectlanguage";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
 import { OpenAI } from "openai";
 import { ExampleComment } from "@/types";
-// import { LinkedInPost } from "@/types";
+import { isUnipileAccountConnected, languagesSupported } from "@/utils/helpers";
+import { sendMail } from "@/utils/mailer/queries";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -14,7 +15,16 @@ const supabase = createClient(
 );
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function generateComment(post: string, unipile_id: string,profileDescription : string) {
+async function generateComment(
+  post: string,
+  unipile_id: string,
+  profileDescription: string,
+  languagePost: string
+) {
+  const fullLanguagePost = languagesSupported.find(
+    (lang) => lang.value === languagePost
+  )?.label as string;
+  console.log("fullLanguagePost", fullLanguagePost);
   const exampleCom = (await retrieveQdrantCom({
     queryVector: await vectorize(post),
     limit: 5,
@@ -30,41 +40,43 @@ async function generateComment(post: string, unipile_id: string,profileDescripti
     messages: [
       {
         role: "system",
-        content: `You are a LinkedIn assistant that writes short, natural-sounding comments.
-  
-# GOAL
-- Write a warm, authentic LinkedIn comment in response to a given post.
-- The comment **must be written in the same language as the post**, no matter what language the user's profile or examples are in.
+        content: `Write a LinkedIn comment that sounds natural, warm, and in line with the tone of the original post. Use the user's profile description and example comments as inspiration.
 
-# RULES
-- Detect the language of the LinkedIn post and generate the comment in that language, whether it’s English, French, Spanish, etc.
 - Keep the tone authentic and conversational: avoid overly formal or robotic language.
-- DO NOT default to the user's profile language. ALWAYS match the post's language.
-- DO NOT USE hyphens as separator, use everyday punctuation (periods, commas) instead.
+- Highlight achievements, collaboration, and positive energy.
+- Be encouraging, friendly, and aligned with the spirit of the post.
 
-# STYLE
-- Max 1–2 sentences.
-- Human tone, like a thoughtful colleague or peer.
-- No clichés, no generic phrases, no emoji overload.
+# Guidelines
 
-# CONTEXT
-You must take inspiration for the tone from the user’s profile description and comment examples—but always match the language of the post.`,
+1. Read the post carefully to identify its key themes: collaboration, innovation, achievements, mindset.
+2. Observe the style and tone of the example comments—aim for a similarly natural and personal voice.
+3. Write a concise, engaging comment in ${fullLanguagePost}.
+
+# Output Format
+- A single LinkedIn comment, 1–2 sentences long.
+- Written in a warm, friendly tone that feels human.
+- Must match the language of the original post.
+
+# Notes
+- Use everyday punctuation (periods, commas) instead of double hyphens or unnatural separators.
+- Avoid language patterns that feel AI-generated (e.g., overuse of emojis, stock phrases, or formulaic expressions).
+- The goal is to blend in naturally with real LinkedIn comments while being thoughtful and relevant.`,
       },
-      {
-        role: "system",
-        content: `# IMPORTANT
-  If the post is in English, reply in English.
-  If the post is in French, reply in French.
-  If the post is in Spanish, reply in Spanish.
-  Ignore the language of the profile or the examples—always follow the post's language.`,
-      },
+      //     {
+      //       role: "system",
+      //       content: `# IMPORTANT
+      // If the post is in English, reply in English.
+      // If the post is in French, reply in French.
+      // If the post is in Spanish, reply in Spanish.
+      // Ignore the language of the profile or the examples—always follow the post's language.`,
+      //     },
       ...exampleMessages, // keep these only if you control them per language
       {
         role: "user",
-        content: `### LinkedIn Profile Description:
+        content: `### My LinkedIn account description:
   ${profileDescription}
   
-  ### LinkedIn Post:
+  ## Post to Comment On (IN ${fullLanguagePost.toUpperCase()}):
   "${post}"`,
       },
     ],
@@ -75,9 +87,8 @@ You must take inspiration for the tone from the user’s profile description and
     presence_penalty: 0,
     stream: false,
   });
-  
 
-  return response.choices[0]?.message.content;
+  return response.choices[0]?.message.content?.replace("—", ",");
 }
 
 async function createComment(
@@ -86,9 +97,15 @@ async function createComment(
   account_id: string,
   author_name: string,
   post_id: string,
-  profileDescription:string
+  profileDescription: string,
+  languagePost: string
 ) {
-  const comment = await generateComment(post, account_id,profileDescription);
+  const comment = await generateComment(
+    post,
+    account_id,
+    profileDescription,
+    languagePost
+  );
   const { error } = await supabase.from("comment_proposal").insert({
     unipile_id: account_id,
     post_text: post,
@@ -103,13 +120,6 @@ async function createComment(
 
 const detectlanguage = new DetectLanguage(process.env.DETECT_LANGUAGE_API_KEY!);
 
-async function isLanguageInList(text: string,selectedLanguages:string[]):Promise<boolean> {
-  const result = await detectlanguage.detect(text);
-  console.log('language detected')
-  console.log("is in list : ",(selectedLanguages.includes(result[0].language)))
-  return selectedLanguages.includes(result[0].language);
-}
-
 export async function POST(req: Request) {
   const body = await req.json();
   console.log(body);
@@ -119,6 +129,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const account_id = body.account_id;
+
+  if (!(await isUnipileAccountConnected(account_id))) {
+    console.log("Account not connected");
+    await sendMail("ia.school.app@gmail.com", "Auto commenter account problem", `Hey, 
+There was a problem accessing to your Linkedin account to generate new comments. Please connect to https://auto-commenter.vercel.app/dashboard to fix the issue.
+
+Best regards,
+Pierre`);    
+    return NextResponse.json({ error: "Account not connected" }, { status: 401 });
+  }
 
   const { data: keywords, error: keywordsError } = await supabase
     .from("keywords")
@@ -183,24 +203,33 @@ export async function POST(req: Request) {
       ).com_per_day_max
   );
   let n_commments = 0;
-for (let i=0;i<2;i++){
-  let selectedLang;
-  if (i==0){
-  const {data } = await supabase.from('unipile_id').select('langues').eq('unipile_id', account_id);
-  selectedLang = data?.[0]?.langues;
-  }else{
-    selectedLang = ["en"];
-  }
-  if (n_commments >= Number(
-    (
-      keywords.unipile_id as unknown as {
-        com_per_day_max: number;
-      }
-    ).com_per_day_max
-  )) break;
+  for (let i = 0; i < 2; i++) {
+    let selectedLang;
+    if (i == 0) {
+      const { data } = await supabase
+        .from("unipile_id")
+        .select("langues")
+        .eq("unipile_id", account_id);
+      selectedLang = data?.[0]?.langues;
+    } else {
+      selectedLang = ["en"];
+    }
+    if (
+      n_commments >=
+      Number(
+        (
+          keywords.unipile_id as unknown as {
+            com_per_day_max: number;
+          }
+        ).com_per_day_max
+      )
+    )
+      break;
     for (const post of posts.items) {
+      const languagePost = await detectlanguage.detect(post.text);
       if (
-        ((Number(post.date.slice(0, -1)) <= 12 && post.date.slice(-1) === "h") ||
+        ((Number(post.date.slice(0, -1)) <= 12 &&
+          post.date.slice(-1) === "h") ||
           post.date.slice(-1) === "m") &&
         n_commments <
           Number(
@@ -211,11 +240,11 @@ for (let i=0;i<2;i++){
             ).com_per_day_max
           ) &&
         post.text.length > 100 &&
-        post.permissions.can_post_comments
+        post.permissions.can_post_comments &&
         //  && keywords.keywords.some((el: string) =>
         //   post.text.split(/[\s.,;!?]+/).includes(el)
         // )
-        && (await isLanguageInList(post.text,selectedLang))
+        selectedLang.includes(languagePost[0].language)
       ) {
         //faiblesse dans l'approche
         const response = await createComment(
@@ -224,13 +253,15 @@ for (let i=0;i<2;i++){
           account_id,
           post.author.name,
           post.social_id,
-          (keywords.unipile_id as unknown as { profile_description: string }).profile_description
+          (keywords.unipile_id as unknown as { profile_description: string })
+            .profile_description,
+          languagePost[0].language
         );
         if (!response.error) n_commments++;
         console.log(response);
       }
     }
-}
+  }
 
   return NextResponse.json({ ok: true });
 }
