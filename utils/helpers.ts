@@ -1,7 +1,4 @@
-import { qdrantSavePost } from "./qdrant/queries";
-import { delCommentProposal, getUnipileId } from "./supabase/queries";
-import { getProviderId, postComment } from "./unipile/queries";
-import { redirectToPath } from "./supabase/server";
+import { getProviderId } from "./unipile/queries";
 
 const toastKeyMap: { [key: string]: string[] } = {
   status: ["status", "status_description"],
@@ -243,18 +240,4 @@ export const isUnipileAccountConnected = async (unipile_id: string) => {
   return true;
 };
 
-export async function acceptComment(
-  post: string,
-  comment: string,
-  id: string,
-  post_id: string,
-  unipile_id?: string
-) {
-  const unipileId = unipile_id || (await getUnipileId());
-  if (unipileId && (await qdrantSavePost(post, comment, unipileId)).success) {
-    await delCommentProposal(id);
-    postComment(post_id,comment,unipileId);
-    redirectToPath(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
-  }
-  redirectToPath(getErrorRedirect("/dashboard", "Failed to accept comment"));
-}
+
