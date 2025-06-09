@@ -232,10 +232,10 @@ async function postComment(post_id:string,comment:string,unipile_id?:string){
     redirect: "follow"
   };
   await new Promise((resolve) => setTimeout(resolve, Math.random() * 50000));
-  // await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
-  //   .then((response) => response.text())
-  //   .then((result) => console.log(result))
-  //   .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
+  await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
+    .then((response) => response.text())
+    .then((result) => console.log(result))
+    .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
 }
 
 export async function acceptComment(
