@@ -98,7 +98,7 @@ export async function GET(req: Request) {
       }: { data: FilterTimezoneReq | null; error: PostgrestError | null } =
         await supabase
           .from("unipile_id")
-          .select("unipile_id,user_timezone(timezone,created_at)")
+          .select("unipile_id,end_trial,user_timezone(timezone,created_at)")
           .eq("unipile_id", account.id.toString())
           .single();
 
@@ -106,6 +106,11 @@ export async function GET(req: Request) {
       if (!user_timezone || filterError) {
         console.log("No timezone found for account", account.id);
         continue;
+      }
+
+      if (new Date(user_timezone.end_trial) < new Date()) {
+        console.log("Trial ended for account", account.id);
+        return NextResponse.json({ error: "Trial ended" }, { status: 401 });
       }
 
       const formattedTime = generateRandomTime(
