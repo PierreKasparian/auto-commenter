@@ -282,9 +282,9 @@ export function getTimezoneOffsetInMinutes(
 export const getRandomPostTime = (timezone: string) => {
   const time = new Date();
   const offsetMinutes = getTimezoneOffsetInMinutes(timezone);
-  const randomMinutes = (Math.floor(Math.random() * 3) + 1) * 5;
-  time.setMinutes(Math.ceil(time.getMinutes() + randomMinutes));
-  const timeofTimezone = time.getTime() + offsetMinutes * 60 * 1000;
+  let randomMinutes = (Math.floor(Math.random() * 6) + 1) * 5;
+  randomMinutes=(Math.ceil((time.getMinutes() + randomMinutes)/5)*5);
+  const timeofTimezone = time.getTime() + ((offsetMinutes+randomMinutes-time.getMinutes()) * 60 * 1000);
   return (timeofTimezone).toString().slice(0, -5);
 };
   
