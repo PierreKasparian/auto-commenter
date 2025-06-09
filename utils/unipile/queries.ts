@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getErrorRedirect, getStatusRedirect } from "../helpers";
 import { qdrantSavePost } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
+import { getUnipileId } from "../supabase/queries";
 
 export async function getPostFromId(postId: string, unipileId: string) {
   console.log("postID : ", postId, "unipileId", unipileId);
@@ -211,3 +212,28 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
   console.log(result);
   return result.url;
 };
+
+export async function postComment(post_id:string,comment:string,unipile_id?:string){
+  const unipileId = unipile_id || (await getUnipileId());
+  const myHeaders = new Headers();
+  myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
+  myHeaders.append("accept", "application/json");
+  myHeaders.append("content-type", "application/json");
+  
+  const raw = JSON.stringify({
+    "account_id": unipileId,
+    "text": comment
+  });
+  
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow"
+  };
+  await new Promise((resolve) => setTimeout(resolve, Math.random() * 180000));
+  await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
+    .then((response) => response.text())
+    .then((result) => console.log(result))
+    .catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
+}

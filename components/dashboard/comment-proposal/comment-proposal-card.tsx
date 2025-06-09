@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns"
 import type { CommentProposal } from "@/types"
 import { Textarea } from "@/components/ui/textarea"
 import { delCommentProposal } from "@/utils/supabase/queries"
-import { acceptComment } from "@/utils/qdrant/queries"
+import { acceptComment } from "@/utils/helpers"
 import { redirectToPath } from "@/utils/supabase/server"
 import { getStatusRedirect } from "@/utils/helpers"
 
