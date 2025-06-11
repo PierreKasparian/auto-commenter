@@ -20,7 +20,7 @@ const supabase = await createClient();
 
   // console.log(JSON.stringify(post_time))
   // console.log(error_time)
-  await postComment("urn:li:activity:7338441119095050240","très intéressant","xH9knahXS82M36FODsMr7Q")
+  // await postComment("urn:li:activity:7338441119095050240","très intéressant","xH9knahXS82M36FODsMr7Q")
   return <div>comment posted</div>;
 };
 
