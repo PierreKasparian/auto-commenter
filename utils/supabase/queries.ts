@@ -84,7 +84,7 @@ export async function getCommentsProposals(id?: string) {
   const { data, error } = await supabase
     .from("comment_proposal")
     .select("id,created_at,post_text,post_link,comment_IA,author_name,post_id,unipile_id(user_timezone(timezone))")
-    .eq("unipile_id", unipile_id);
+    .eq("unipile_id", unipile_id).is("post_time", null);
   if (error) console.log(error);
   return data;
 }
