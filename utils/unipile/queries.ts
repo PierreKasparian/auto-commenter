@@ -1,6 +1,10 @@
-"use server"
+"use server";
 import { redirect } from "next/navigation";
-import { getErrorRedirect, getStatusRedirect, waitRandomTime } from "../helpers";
+import {
+  getErrorRedirect,
+  getStatusRedirect,
+  waitRandomTime,
+} from "../helpers";
 import { qdrantSavePost } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { delCommentProposal, getUnipileId } from "../supabase/queries";
@@ -18,7 +22,7 @@ export async function getPostFromId(postId: string, unipileId: string) {
   };
 
   const post = await fetch(
-    "https://api10.unipile.com:14079/api/v1/posts/" +
+    "https://api1.unipile.com:13115/api/v1/posts/" +
       postId +
       "?account_id=" +
       unipileId,
@@ -42,7 +46,7 @@ export async function getProviderId(unipile_id: string) {
     redirect: "follow",
   };
   const provider_id = await fetch(
-    "https://api10.unipile.com:14079/api/v1/users/me?account_id=" + unipile_id,
+    "https://api1.unipile.com:13115/api/v1/users/me?account_id=" + unipile_id,
     requestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -65,7 +69,7 @@ export async function getUserComments(unipileId: string, provider_id: string) {
   };
 
   const comments = await fetch(
-    `https://api10.unipile.com:14079/api/v1/users/${provider_id}/comments?account_id=${unipileId}`,
+    `https://api1.unipile.com:13115/api/v1/users/${provider_id}/comments?account_id=${unipileId}`,
     comRequestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -85,7 +89,7 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
   };
 
   const response = await fetch(
-    "https://api10.unipile.com:14079/api/v1/users/" +
+    "https://api1.unipile.com:13115/api/v1/users/" +
       provider_id +
       "?account_id=" +
       unipileId,
@@ -116,7 +120,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   };
 
   const response = await fetch(
-    "https://api10.unipile.com:14079/api/v1/accounts",
+    "https://api1.unipile.com:13115/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
   await new Promise((resolve) => setTimeout(resolve, 10000));
@@ -189,7 +193,7 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
     type: "reconnect",
     providers: "*",
     expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    api_url: "https://api10.unipile.com:14079/api/v1/accounts",
+    api_url: "https://api1.unipile.com:13115/api/v1/accounts",
     reconnect_account: unipile_id,
   });
 
@@ -201,7 +205,7 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
   };
 
   const result = await fetch(
-    "https://api10.unipile.com:14079/api/v1/hosted/accounts/link",
+    "https://api1.unipile.com:13115/api/v1/hosted/accounts/link",
     requestOptions as RequestInit
   )
     .then(async (response) => await response.json())
@@ -213,29 +217,96 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
   return result.url;
 };
 
-export async function postComment(post_id:string,comment:string,unipile_id?:string){
+export async function postComment(
+  post_id: string,
+  comment: string,
+  unipile_id?: string
+) {
   const unipileId = unipile_id || (await getUnipileId());
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
-  
+
   const raw = JSON.stringify({
-    "account_id": unipileId,
-    "text": comment
+    account_id: unipileId,
+    text: comment,
   });
-  
+
   const requestOptions = {
     method: "POST",
     headers: myHeaders,
     body: raw,
-    redirect: "follow"
+    redirect: "follow",
   };
   // await waitRandomTime();
-  console.log('comment close to posting..')
-  const res=await fetch("https://api10.unipile.com:14079/api/v1/posts/"+post_id.replaceAll(":","%3A")+"/comments", requestOptions as RequestInit)
+  console.log("comment close to posting..");
+  const res = await fetch(
+    "https://api1.unipile.com:13115/api/v1/posts/" +
+      post_id.replaceAll(":", "%3A") +
+      "/comments",
+    requestOptions as RequestInit
+  )
     .then((response) => response.text())
     // .then((result) => console.log(result))
     .catch((error) => console.log(error));
-    console.log(res)
+  console.log(res);
+}
+
+export async function fuckUnipile(accessToken: string, userAgent: string) {
+
+  const myHeaders = new Headers();
+  myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
+  myHeaders.append("accept", "application/json");
+  myHeaders.append("content-type", "application/json");
+
+  const raw = JSON.stringify({
+    provider: "LINKEDIN",
+    access_token: accessToken,
+    user_agent: userAgent,
+  });
+
+  const requestOptions = {
+    method: "POST",
+    headers: myHeaders,
+    body: raw,
+    redirect: "follow",
+  };
+  const response = await fetch(
+    "https://api1.unipile.com:13115/api/v1/accounts",
+    requestOptions as RequestInit
+  ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
+  await new Promise((resolve) => setTimeout(resolve, 10000));
+  console.log(response);
+  const result = await response.json();
+  if (result.object == "AccountCreated") {
+    const supabase = await createClient();
+    const { data, error } = await supabase.auth.getUser();
+    if (error || !data.user) {
+      redirect(
+        getErrorRedirect(
+          "/dashboard",
+          "Error",
+          error?.message ?? "No user found"
+        )
+      );
+    }
+    const { error: unipileError } = await supabase
+      .from("unipile_id")
+      .update({
+        unipile_id: result.account_id,
+      })
+      .eq("user_id", data.user.id);
+    if (unipileError) {
+      console.log(unipileError);
+      redirect(getErrorRedirect("/dashboard", "Error", unipileError.message));
+    }
+    redirect(
+      getStatusRedirect(
+        "/dashboard",
+        "Success ! 🎉",
+        "Your account has been successfully connected"
+      )
+    );
+  }
 }

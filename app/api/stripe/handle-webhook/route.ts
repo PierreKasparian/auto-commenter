@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { handleCheckoutCompleted,handleSubscriptionDeleted } from "@/utils/stripe/webhooks";
 
-const stripe = new Stripe(process.env.STRIPE_TEST_SECRET_KEY!);
-const webhookSecret = process.env.STRIPE_TEST_WEBHOOK_SECRET!;
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
   try {

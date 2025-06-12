@@ -21,7 +21,7 @@ export async function signOut() {
   );
 }
 
-export const getUnipileId = async (): Promise<string | null> => {
+export const getUnipileId = async (): Promise<string|null> => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error) {
@@ -37,7 +37,6 @@ export const getUnipileId = async (): Promise<string | null> => {
     .eq("user_id", data.user.id);
   if (unipileError) {
     console.log(unipileError);
-    return null;
   }
   return unipileData?.[0]?.unipile_id;
 };
@@ -169,4 +168,20 @@ export async function acceptComment(
     redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
   }
   redirect(getErrorRedirect("/dashboard", "Failed to accept comment"));
+}
+
+export const isTrialEnded = async (unipile_id: string|null) => {
+  if (!unipile_id) return true;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("unipile_id")
+    .select("end_trial")
+    .eq("unipile_id", unipile_id)
+    .single();
+    console.log(data)
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return new Date(data.end_trial) < new Date() || !data.end_trial;
 }

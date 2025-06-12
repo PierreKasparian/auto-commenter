@@ -59,8 +59,8 @@ export async function LinkedInAccountCard({
               Disconnect
             </Button> */}
           </div>
-        ) : !unipileId ? (
-          <LinkedInConnectForm />
+        ) : !unipileId || (!url) ? (
+          <LinkedInConnectForm reconnectForTrial={!url}/>
         ) : (
           <Link href={url}>
             <Button>Reconnect</Button>

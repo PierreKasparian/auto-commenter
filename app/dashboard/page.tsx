@@ -1,7 +1,8 @@
 export const maxDuration = 60;
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import React from "react";
 import { Separator } from "@/components/ui/separator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import KeywordsChoose from "@/components/dashboard/kw-choose";
 import AccountsChoose from "@/components/dashboard/accounts-choose";
 import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card";
@@ -15,13 +16,24 @@ import { getCommentsProposals } from "@/utils/supabase/queries";
 import LanguageChoose from "@/components/dashboard/language-choose";
 import { isUnipileAccountConnected } from "@/utils/helpers";
 import { CommentProposal } from "@/types";
-
+import { isTrialEnded } from "@/utils/supabase/queries";
+import Link from "next/link";
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
-  const isConnected = await isUnipileAccountConnected(unipile_id ?? "");
-  const keywords = await getKeywords();
-  const langues = await getLanguages();
-  const commentsProposals = await getCommentsProposals(unipile_id ?? undefined) as unknown as CommentProposal[];
+  const hasSubscription = !(await isTrialEnded(unipile_id));
+  console.log(hasSubscription)
+  let isConnected = false;
+  let keywords: string[] = [];
+  let langues: string[] = [];
+  let commentsProposals: CommentProposal[] = [];
+  if (hasSubscription) {
+    isConnected = await isUnipileAccountConnected(unipile_id ?? "");
+    keywords = await getKeywords();
+    langues = await getLanguages();
+    commentsProposals = (await getCommentsProposals(
+      unipile_id ?? undefined
+    )) as unknown as CommentProposal[];
+  }
   return (
     <>
       <Navbar isDashboard={true} />
@@ -38,30 +50,58 @@ const DashboardPage = async () => {
           </div>
           <Separator />
           {/* Configuration Section */}
-          {unipile_id && isConnected && (
-            <>
-              <div className="space-y-8 w-full">
-                <CommentProposalsComponent
-                  commentsProposals={commentsProposals}
-                />
+          {!hasSubscription ? (
+            <div className="w-full">
+              <Card className="w-full">
+                <CardHeader>
+                  <CardTitle className="text-2xl font-semibold mb-2">Get Started with Auto-Commenter</CardTitle>
+                </CardHeader>
+                <CardContent className="">
+                  <p className="text-muted-foreground mb-6">
+                    Unlock the power of automated LinkedIn engagement with our premium features.
+                  </p>
+                  <Link
+                    href="/dashboard/purchase-credits"
+                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-teal-600 text-white hover:bg-teal-700 h-10 px-4 py-2"
+                  >
+                    Purchase Credits
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          ) : (
+            unipile_id &&
+            isConnected && (
+              <>
+                <div className="space-y-8 w-full">
+                  <CommentProposalsComponent
+                    commentsProposals={commentsProposals}
+                  />
 
-                <div className="w-full flex flex-row space-x-8">
-                  <div className="w-full space-y-4">
-                    <KeywordsChoose unipileId={unipile_id} kw={keywords} />{" "}
-                    <AccountsChoose />
-                    <LanguageChoose unipileId={unipile_id} langues={langues} />
+                  <div className="w-full flex flex-row space-x-8">
+                    <div className="w-full space-y-4">
+                      <KeywordsChoose unipileId={unipile_id} kw={keywords} />{" "}
+                      <AccountsChoose />
+                      <LanguageChoose
+                        unipileId={unipile_id}
+                        langues={langues}
+                      />
+                    </div>
+                    <YourTone />
                   </div>
-                  <YourTone />
-                </div>
 
-                {/* Accounts Configuration */}
-              </div>
-              <Separator />{" "}
-            </>
-          )}{" "}
-          <div className="w-full">
-            <LinkedInAccountCard unipileId={unipile_id} isConnected={isConnected}/>
-          </div>
+                  {/* Accounts Configuration */}
+                </div>
+                <Separator />{" "}
+                <div className="w-full">
+                  <LinkedInAccountCard
+                    unipileId={unipile_id}
+                    isConnected={isConnected}
+                  />
+                </div>
+              </>
+            )
+          )}
         </div>
       </div>
     </>

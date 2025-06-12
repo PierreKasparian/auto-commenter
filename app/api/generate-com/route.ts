@@ -177,7 +177,7 @@ Pierre`);
   };
   console.log(JSON.stringify(requestOptions));
   const posts = await fetch(
-    `https://api10.unipile.com:14079/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
+    `https://api1.unipile.com:13115/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
     requestOptions as RequestInit
   )
     .then((response) => {

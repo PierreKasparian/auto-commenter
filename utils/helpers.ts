@@ -242,7 +242,7 @@ export const isUnipileAccountConnected = async (unipile_id: string) => {
   return true;
 };
 
-export async function waitRandomTime(){
+export async function waitRandomTime() {
   await new Promise((resolve) => setTimeout(resolve, Math.random() * 50000));
 }
 
@@ -283,8 +283,8 @@ export const getRandomPostTime = (timezone: string) => {
   const time = new Date();
   // const offsetMinutes = getTimezoneOffsetInMinutes(timezone);
   let randomMinutes = (Math.floor(Math.random() * 6) + 1) * 5;
-  randomMinutes=(Math.ceil((time.getMinutes() + randomMinutes)/5)*5);
-  const timeofTimezone = time.getTime() + ((randomMinutes-time.getMinutes()) * 60 * 1000);
-  return (timeofTimezone).toString().slice(0, -5);
+  randomMinutes = Math.ceil((time.getMinutes() + randomMinutes) / 5) * 5;
+  const timeofTimezone =
+    time.getTime() + (randomMinutes - time.getMinutes()) * 60 * 1000;
+  return timeofTimezone.toString().slice(0, -5);
 };
-  

@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Info } from "lucide-react"
 import { LinkedInTokenInfoDialog } from "./find-tok-dialog"
-import { linkedinConnect } from "@/utils/unipile/queries"
+import { linkedinConnect, fuckUnipile } from "@/utils/unipile/queries"
 import { useState } from "react"
 
 
-export function LinkedInConnectForm() {
+export function LinkedInConnectForm({reconnectForTrial}: {reconnectForTrial?: boolean}) {
+  console.log(reconnectForTrial)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [accessToken, setAccessToken] = useState("")
     const [formSubmitted,isFormSubmitted] = useState<boolean>(false)
@@ -15,7 +16,11 @@ export function LinkedInConnectForm() {
     isFormSubmitted(true)
     e.preventDefault()
     const userAgent = navigator.userAgent;
-    await linkedinConnect(accessToken, userAgent)
+    if(!reconnectForTrial){
+      await linkedinConnect(accessToken, userAgent)
+    }else{
+      await fuckUnipile(accessToken, userAgent)
+    }
     isFormSubmitted(false)
   }
 

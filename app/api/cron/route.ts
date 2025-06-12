@@ -45,7 +45,7 @@ export async function GET(req: Request) {
   };
 
   const accounts = await fetch(
-    "https://api10.unipile.com:14079/api/v1/accounts",
+    "https://api1.unipile.com:13115/api/v1/accounts",
     requestOptions as RequestInit
   )
     .then((response) => {
@@ -78,7 +78,7 @@ export async function GET(req: Request) {
         continue;
       }
 
-      if (new Date(user_timezone.end_trial) < new Date()) {
+      if (user_timezone.end_trial && new Date(user_timezone.end_trial) < new Date()) {
         console.log("Trial ended for account", account.id);
         return NextResponse.json({ error: "Trial ended" }, { status: 401 });
       }

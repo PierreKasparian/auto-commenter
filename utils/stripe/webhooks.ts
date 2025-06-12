@@ -1,7 +1,7 @@
 "use server"
 import { createClient } from "@/utils/supabase/server";
 import Stripe from "stripe";
-const stripe = new Stripe(process.env.STRIPE_TEST_SECRET_KEY!);
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function handleSubscriptionDeleted(event: Stripe.Event) {
 
@@ -19,7 +19,7 @@ export async function handleSubscriptionDeleted(event: Stripe.Event) {
     const { data: data_select_credits, error: error_select_credits } =
     await supabase
       .from("unipile_id")
-      .update({ com_per_day_max: 0 })
+      .update({ com_per_day_max: 0, end_trial: new Date() })
       .eq("customer_id", customerId)
       .select();
     console.log("data_select_credits", data_select_credits);
@@ -46,18 +46,18 @@ export async function handleCheckoutCompleted(event: Stripe.Event) {
       console.log("itemId", itemId);
       if (
         ![
-          process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_90_ID,
-          process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_180_ID,
-          process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_10_ID,
-          process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_20_ID,
+          process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID,
+          process.env.NEXT_PUBLIC_STRIPE_TARIF_180_ID,
+          process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID,
+          process.env.NEXT_PUBLIC_STRIPE_TARIF_20_ID,
         ].includes(itemId)
       ) {
         return [{ error: "Invalid plan" }, { status: 400 }];
       }
       console.log('itemId',itemId)
       const credits =
-        itemId === process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_90_ID ||
-        itemId === process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_10_ID
+        itemId === process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID ||
+        itemId === process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID
           ? 10
           : 25;
       // Update Supabase
@@ -66,7 +66,7 @@ export async function handleCheckoutCompleted(event: Stripe.Event) {
       const { data: data_select_credits, error: error_select_credits } =
         await supabase
           .from("unipile_id")
-          .update({ com_per_day_max: credits, customer_id: customerId })
+          .update({ com_per_day_max: credits, customer_id: customerId, end_trial: null })
           .eq("user_id", userId)
           .select();
       console.log("data_select_credits", data_select_credits);

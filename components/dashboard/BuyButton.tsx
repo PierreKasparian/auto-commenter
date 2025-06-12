@@ -9,15 +9,15 @@ import { CreditAmount } from "@/types";
 import { redirectToPath } from "@/utils/supabase/server";
 import { getErrorRedirect } from "@/utils/helpers";
 import { getUnipileId } from "@/utils/supabase/queries";
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_TEST_PUBLIC_KEY!);
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 
 
 const priceMap: Record<CreditAmount, string> = {
-  10: process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_10_ID!,
-  20: process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_20_ID!,
-  90: process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_90_ID!,
-  180: process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_180_ID!,
+  10: process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID!,
+  20: process.env.NEXT_PUBLIC_STRIPE_TARIF_20_ID!,
+  90: process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID!,
+  180: process.env.NEXT_PUBLIC_STRIPE_TARIF_180_ID!,
 };
 
 const BuyButton = ({ credits,className }: { credits: CreditAmount,className?:ClassValue }) => {
@@ -28,7 +28,7 @@ const BuyButton = ({ credits,className }: { credits: CreditAmount,className?:Cla
       redirectToPath(getErrorRedirect("/dashboard","You need to connect to your linkedin account to buy credits"))
       return;
     }
-    console.log("tarif",process.env.NEXT_PUBLIC_STRIPE_TEST_TARIF_10_ID)
+    console.log("tarif",process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID)
     console.log(priceMap[credits])
     const stripe = await stripePromise;
 
