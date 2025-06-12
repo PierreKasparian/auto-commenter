@@ -183,5 +183,6 @@ export const isTrialEnded = async (unipile_id: string|null) => {
     console.log(error);
     return false;
   }
-  return new Date(data.end_trial) < new Date() || !data.end_trial;
+  if (!data.end_trial) return false;
+  return new Date(data.end_trial) < new Date();
 }
