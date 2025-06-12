@@ -22,6 +22,7 @@ export async function LinkedInAccountCard({
   let url;
   if (!isConnected) {
     url = await getUnipileReconnectUrl(unipileId!);
+    console.log('url',url)
   }
   return (
     <Card className="w-full">
@@ -60,7 +61,7 @@ export async function LinkedInAccountCard({
             </Button> */}
           </div>
         ) : !unipileId || (!url) ? (
-          <LinkedInConnectForm unipileId={unipileId} reconnectForTrial={!url}/>
+          <LinkedInConnectForm unipileId={unipileId} reconnectForTrial={!url && !!unipileId}/>
         ) : (
           <Link href={url}>
             <Button>Reconnect</Button>

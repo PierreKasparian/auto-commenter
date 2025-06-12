@@ -20,6 +20,7 @@ import { isTrialEnded } from "@/utils/supabase/queries";
 import Link from "next/link";
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
+  console.log(unipile_id);
   const hasSubscription = !(await isTrialEnded(unipile_id));
   console.log(hasSubscription);
   let isConnected = false;
@@ -48,9 +49,11 @@ const DashboardPage = async () => {
               Automate your LinkedIn engagement with smart commenting
             </p>
           </div>
-          <Separator />
+          
           {/* Configuration Section */}
-          {!hasSubscription ? (
+          {!hasSubscription && unipile_id ? (
+            <>
+            <Separator />
             <div className="w-full">
               <Card className="w-full">
                 <CardHeader>
@@ -72,10 +75,12 @@ const DashboardPage = async () => {
                 </CardContent>
               </Card>
             </div>
+            </>
           ) : (
             unipile_id &&
             isConnected && (
               <>
+              <Separator />
                 <div className="space-y-8 w-full">
                   <div className="w-full flex flex-row space-x-8">
                     <div className="w-full space-y-4">
@@ -94,15 +99,19 @@ const DashboardPage = async () => {
 
                   {/* Accounts Configuration */}
                 </div>
-                <Separator />{" "}
-                <div className="w-full">
-                  <LinkedInAccountCard
-                    unipileId={unipile_id}
-                    isConnected={isConnected}
-                  />
-                </div>
               </>
             )
+          )}
+          {(hasSubscription || !unipile_id) && (
+            <>
+              <Separator />{" "}
+              <div className="w-full">
+                <LinkedInAccountCard
+                  unipileId={unipile_id}
+                  isConnected={isConnected}
+                />
+              </div>
+            </>
           )}
         </div>
       </div>
