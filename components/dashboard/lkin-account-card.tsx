@@ -60,7 +60,7 @@ export async function LinkedInAccountCard({
             </Button> */}
           </div>
         ) : !unipileId || (!url) ? (
-          <LinkedInConnectForm reconnectForTrial={!url}/>
+          <LinkedInConnectForm unipileId={unipileId} reconnectForTrial={!url}/>
         ) : (
           <Link href={url}>
             <Button>Reconnect</Button>

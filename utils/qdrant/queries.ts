@@ -103,3 +103,39 @@ export async function qdrantDelPost(id: number | string) {
   }
   return { success: true };
 }
+
+export async function qdrantUpdateUnipileId(former_id:string,unipile_id: string){
+  
+  // Étape 1 : Récupérer les points avec unipile_id = "caca"
+  const pointsToUpdate = await client.scroll("comment_history", {
+    limit: 10000, // adapte selon le volume
+    with_payload: true,
+    filter: {
+      must: [
+        {
+          key: 'unipile_id',
+          match: {
+            value: former_id,
+          },
+        },
+      ],
+    },
+  });
+
+  const pointIds = pointsToUpdate.points.map((pt) => pt.id);
+
+  if (pointIds.length === 0) {
+    console.log('Aucun point à mettre à jour');
+    return;
+  }
+
+  // Étape 2 : Mettre à jour le payload des points
+  await client.setPayload("comment_history", {
+    points: pointIds,
+    payload: {
+      unipile_id: unipile_id,
+    },
+  });
+
+  console.log(`Mis à jour ${pointIds.length} points`);
+}

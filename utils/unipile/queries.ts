@@ -5,7 +5,7 @@ import {
   getStatusRedirect,
   waitRandomTime,
 } from "../helpers";
-import { qdrantSavePost } from "../qdrant/queries";
+import { qdrantSavePost, qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { delCommentProposal, getUnipileId } from "../supabase/queries";
 
@@ -253,7 +253,7 @@ export async function postComment(
   console.log(res);
 }
 
-export async function fuckUnipile(accessToken: string, userAgent: string) {
+export async function fuckUnipile(accessToken: string, userAgent: string, unipile_id?: string) {
 
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
@@ -276,9 +276,10 @@ export async function fuckUnipile(accessToken: string, userAgent: string) {
     "https://api1.unipile.com:13115/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   console.log(response);
   const result = await response.json();
+  await qdrantUpdateUnipileId(unipile_id!,result.account_id);
   if (result.object == "AccountCreated") {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();

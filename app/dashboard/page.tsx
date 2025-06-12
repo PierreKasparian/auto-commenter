@@ -21,7 +21,7 @@ import Link from "next/link";
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
   const hasSubscription = !(await isTrialEnded(unipile_id));
-  console.log(hasSubscription)
+  console.log(hasSubscription);
   let isConnected = false;
   let keywords: string[] = [];
   let langues: string[] = [];
@@ -54,11 +54,14 @@ const DashboardPage = async () => {
             <div className="w-full">
               <Card className="w-full">
                 <CardHeader>
-                  <CardTitle className="text-2xl font-semibold mb-2">Get Started with Auto-Commenter</CardTitle>
+                  <CardTitle className="text-2xl font-semibold mb-2">
+                    Get Started with Auto-Commenter
+                  </CardTitle>
                 </CardHeader>
                 <CardContent className="">
                   <p className="text-muted-foreground mb-6">
-                    Unlock the power of automated LinkedIn engagement with our premium features.
+                    Unlock the power of automated LinkedIn engagement with our
+                    premium features.
                   </p>
                   <Link
                     href="/dashboard/purchase-credits"
@@ -74,10 +77,6 @@ const DashboardPage = async () => {
             isConnected && (
               <>
                 <div className="space-y-8 w-full">
-                  <CommentProposalsComponent
-                    commentsProposals={commentsProposals}
-                  />
-
                   <div className="w-full flex flex-row space-x-8">
                     <div className="w-full space-y-4">
                       <KeywordsChoose unipileId={unipile_id} kw={keywords} />{" "}
@@ -89,6 +88,9 @@ const DashboardPage = async () => {
                     </div>
                     <YourTone />
                   </div>
+                  <CommentProposalsComponent
+                    commentsProposals={commentsProposals}
+                  />
 
                   {/* Accounts Configuration */}
                 </div>

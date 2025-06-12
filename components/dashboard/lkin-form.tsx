@@ -7,7 +7,7 @@ import { linkedinConnect, fuckUnipile } from "@/utils/unipile/queries"
 import { useState } from "react"
 
 
-export function LinkedInConnectForm({reconnectForTrial}: {reconnectForTrial?: boolean}) {
+export function LinkedInConnectForm({unipileId, reconnectForTrial}: {unipileId?: string|null, reconnectForTrial?: boolean}) {
   console.log(reconnectForTrial)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [accessToken, setAccessToken] = useState("")
@@ -19,7 +19,7 @@ export function LinkedInConnectForm({reconnectForTrial}: {reconnectForTrial?: bo
     if(!reconnectForTrial){
       await linkedinConnect(accessToken, userAgent)
     }else{
-      await fuckUnipile(accessToken, userAgent)
+      await fuckUnipile(accessToken, userAgent, unipileId!)
     }
     isFormSubmitted(false)
   }
