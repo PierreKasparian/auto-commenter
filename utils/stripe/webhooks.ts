@@ -46,7 +46,6 @@ export async function handleCheckoutCompleted(event: Stripe.Event) {
       console.log("itemId", itemId);
       if (
         ![
-          process.env.NEXT_PUBLIC_STRIPE_TARIF_1_ID,
           process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID,
           process.env.NEXT_PUBLIC_STRIPE_TARIF_180_ID,
           process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID,
@@ -88,10 +87,10 @@ export async function handleSubscriptionUpdated(event: Stripe.Event) {
     console.log("dedans");
     const subscription = event.data.object as Stripe.Subscription;
     console.log("subscription", JSON.stringify(subscription));
-    const userId = subscription.metadata?.user_id; // Get user_id from metadata
-    if (!userId) {
+    const customerId = subscription.customer as string;
+    if (!customerId) {
       return [
-        { error: "Missing user_id in metadata" },
+        { error: "Missing customerId" },
         { status: 400 }
       ];
     }
@@ -100,7 +99,6 @@ export async function handleSubscriptionUpdated(event: Stripe.Event) {
     }
     if (
       ![
-        process.env.NEXT_PUBLIC_STRIPE_TARIF_1_ID,
         process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID,
         process.env.NEXT_PUBLIC_STRIPE_TARIF_180_ID,
         process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID,
@@ -116,13 +114,13 @@ export async function handleSubscriptionUpdated(event: Stripe.Event) {
           : 25;
     // Update Supabase
     const supabase = await createClient(); // No need to await here
-    console.log(userId)
+    console.log(customerId)
     const { data: data_select_credits } =
       await supabase
         .from("unipile_id")
         .update({ com_per_day_max: credits, end_trial: null })
-        .eq("user_id", userId)
+        .eq("customer_id", customerId)
         .select();
     console.log("data_select_credits", data_select_credits);
-    console.log(`Updated user ${userId} with customer ${subscription.customer}`);
+    console.log(`Updated user with customer ${customerId}`);
 }

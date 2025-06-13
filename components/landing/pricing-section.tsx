@@ -32,7 +32,7 @@ export function PricingSection({ isDashboard }: { isDashboard?: boolean }) {
       name: "Professional",
       description:
         "For professionals who want to develop their LinkedIn network",
-      monthlyPrice: 1,
+      monthlyPrice: 20,
       annualPrice: 180,
       features: [
         "25 automatic comments per day",

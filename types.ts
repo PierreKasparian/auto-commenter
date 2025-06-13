@@ -100,7 +100,7 @@ export interface CommentProposal{
     }
 }[]
 
-export type CreditAmount = 1 | 10 | 20 | 90 | 180;
+export type CreditAmount = 10 | 20 | 90 | 180;
 
 export interface ExampleComment {
     role: "assistant";
