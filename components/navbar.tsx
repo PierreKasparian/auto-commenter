@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import { signOut } from "@/utils/supabase/queries";
 import { redirectToPath } from "@/utils/supabase/server";
 import { createClient } from "@/utils/supabase/client";
+import { getErrorRedirect } from "@/utils/helpers";
 
 export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,6 +21,7 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
         body: JSON.stringify({ user_id: user.user?.id }),
       });
       const { url } = await response.json();
+      if (!url)redirectToPath(getErrorRedirect("/dashboard","Error","No account found. Please subscribe before managing account."));
       redirectToPath(url);
     } catch (error) {
       console.error(error);

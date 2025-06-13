@@ -46,6 +46,7 @@ export async function handleCheckoutCompleted(event: Stripe.Event) {
       console.log("itemId", itemId);
       if (
         ![
+          process.env.NEXT_PUBLIC_STRIPE_TARIF_1_ID,
           process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID,
           process.env.NEXT_PUBLIC_STRIPE_TARIF_180_ID,
           process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID,
@@ -82,4 +83,46 @@ export async function handleCheckoutCompleted(event: Stripe.Event) {
       }
 
       console.log(`Updated user ${userId} with customer ${customerId}`);
+}
+export async function handleSubscriptionUpdated(event: Stripe.Event) {
+    console.log("dedans");
+    const subscription = event.data.object as Stripe.Subscription;
+    console.log("subscription", JSON.stringify(subscription));
+    const userId = subscription.metadata?.user_id; // Get user_id from metadata
+    if (!userId) {
+      return [
+        { error: "Missing user_id in metadata" },
+        { status: 400 }
+      ];
+    }
+    if (subscription.status !== "active") {
+        await handleSubscriptionDeleted(event);
+    }
+    if (
+      ![
+        process.env.NEXT_PUBLIC_STRIPE_TARIF_1_ID,
+        process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID,
+        process.env.NEXT_PUBLIC_STRIPE_TARIF_180_ID,
+        process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID,
+        process.env.NEXT_PUBLIC_STRIPE_TARIF_20_ID,
+      ].includes(subscription.items.data[0].plan.id)
+    ) {
+      return [{ error: "Invalid plan" }, { status: 400 }];
+    }
+    const credits =
+        subscription.items.data[0].plan.id === process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID ||
+        subscription.items.data[0].plan.id === process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID
+          ? 10
+          : 25;
+    // Update Supabase
+    const supabase = await createClient(); // No need to await here
+    console.log(userId)
+    const { data: data_select_credits } =
+      await supabase
+        .from("unipile_id")
+        .update({ com_per_day_max: credits, end_trial: null })
+        .eq("user_id", userId)
+        .select();
+    console.log("data_select_credits", data_select_credits);
+    console.log(`Updated user ${userId} with customer ${subscription.customer}`);
 }

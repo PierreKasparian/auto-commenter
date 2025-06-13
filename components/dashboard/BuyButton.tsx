@@ -14,6 +14,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY!);
 
 
 const priceMap: Record<CreditAmount, string> = {
+  1: process.env.NEXT_PUBLIC_STRIPE_TARIF_1_ID!,
   10: process.env.NEXT_PUBLIC_STRIPE_TARIF_10_ID!,
   20: process.env.NEXT_PUBLIC_STRIPE_TARIF_20_ID!,
   90: process.env.NEXT_PUBLIC_STRIPE_TARIF_90_ID!,

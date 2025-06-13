@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { handleCheckoutCompleted,handleSubscriptionDeleted } from "@/utils/stripe/webhooks";
+import { handleCheckoutCompleted,handleSubscriptionDeleted,handleSubscriptionUpdated } from "@/utils/stripe/webhooks";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
@@ -37,6 +37,9 @@ export async function POST(request: Request) {
     }else if (event.type === "customer.subscription.deleted") {
         console.log("deleted")
         await handleSubscriptionDeleted(event);
+    }else if (event.type === "customer.subscription.updated") {
+        console.log("updated")
+        await handleSubscriptionUpdated(event);
     }
 
     return NextResponse.json({ received: true });

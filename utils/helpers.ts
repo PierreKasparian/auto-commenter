@@ -288,3 +288,4 @@ export const getRandomPostTime = (timezone: string) => {
     time.getTime() + (randomMinutes - time.getMinutes()) * 60 * 1000;
   return timeofTimezone.toString().slice(0, -5);
 };
+
