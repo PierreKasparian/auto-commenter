@@ -50,9 +50,9 @@ export async function LinkedInAccountCard({
               </Avatar>
               <div>
                 <p className="font-medium">You&apos;re connected</p>
-                <p className="text-sm text-muted-foreground">
+                {/* <p className="text-sm text-muted-foreground">
                   You can disconnect when you want
-                </p>
+                </p> */}
               </div>
             </div>
             {/* <Button variant="outline" size="sm" >

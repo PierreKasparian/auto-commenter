@@ -147,9 +147,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
     console.log(profileDescription);
     const { error: unipileError } = await supabase.from("unipile_id").insert({
       unipile_id: result.account_id,
-      access_token: accessToken,
       user_id: data.user.id,
-      user_agent: userAgent,
       com_per_day_max: 2, //a changer
       profile_description: profileDescription ?? "",
     });

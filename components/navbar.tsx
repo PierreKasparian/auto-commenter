@@ -14,14 +14,21 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handleManageSubscription = async () => {
     const supabase = await createClient();
-    const {data: user } = await supabase.auth.getUser();
+    const { data: user } = await supabase.auth.getUser();
     try {
-      const response = await fetch('/api/stripe/create-portal-session', {
-        method: 'POST',
+      const response = await fetch("/api/stripe/create-portal-session", {
+        method: "POST",
         body: JSON.stringify({ user_id: user.user?.id }),
       });
       const { url } = await response.json();
-      if (!url)redirectToPath(getErrorRedirect("/dashboard","Error","No account found. Please subscribe before managing account."));
+      if (!url)
+        redirectToPath(
+          getErrorRedirect(
+            "/dashboard",
+            "Error",
+            "No account found. Please subscribe before managing account."
+          )
+        );
       redirectToPath(url);
     } catch (error) {
       console.error(error);
@@ -89,6 +96,12 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
                 Dashboard
               </Link>
               <Link
+                href="/dashboard/comment-suggestion"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Comment suggestion
+              </Link>
+              <Link
                 href="/dashboard/purchase-credits"
                 className="text-gray-600 hover:text-teal-600 transition-colors"
               >
@@ -149,6 +162,12 @@ export function Navbar({ isDashboard }: { isDashboard?: boolean }) {
                 >
                   Dashboard
                 </Link>
+              <Link
+                href="/dashboard/comment-suggestion"
+                className="text-gray-600 hover:text-teal-600 transition-colors"
+              >
+                Comment suggestion
+              </Link>
                 <Link
                   href="/dashboard/purchase-credits"
                   className="block text-gray-600 hover:text-teal-600 transition-colors"

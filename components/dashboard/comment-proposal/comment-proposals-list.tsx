@@ -28,9 +28,9 @@ export async function CommentProposalsList({commentsProposals}: {commentsProposa
               />
             </svg>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No pending comment proposals</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No pending comment suggestion</h3>
           <p className="text-gray-500">
-            Your comments proposals will appear here. Select options below to begin matching posts and generating comments.
+            Your comment suggestion will appear here. Select options below to begin matching posts and generating comments.
           </p>
         </div>
       </div>
