@@ -9,7 +9,7 @@ import {
   getProviderId,
   getUserComments,
 } from "@/utils/unipile/queries";
-import { qdrantSavePost, retrieveQdrantCom } from "@/utils/qdrant/queries";
+import { qdrantSavePost } from "@/utils/qdrant/queries";
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
