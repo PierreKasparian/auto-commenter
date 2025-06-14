@@ -36,42 +36,34 @@ async function generateComment(
     content: comment,
   }));
   console.log("exampleMessages");
-  console.log(exampleMessages)
+  console.log(exampleMessages);
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
     messages: [
       {
         role: "system",
-        content: `Write a LinkedIn comment that sounds natural, warm, and in line with the tone of the original post. Use the user's profile description and example comments as inspiration.
+        content: `**Instruction:**  
+Write a LinkedIn comment that sounds natural, warm, and in line with the tone of the original post. Use the user's profile description and example comments as inspiration.
 
-- Keep the tone authentic and conversational: avoid overly formal or robotic language.
-- Highlight achievements, collaboration, and positive energy.
-- Be encouraging, friendly, and aligned with the spirit of the post.
+**Important:**  
+Match the tone of the example comments exactly. Your output must feel like it was written by the same person who wrote the examples — same energy, same vocabulary, same rhythm.
 
-# Guidelines
+### Guidelines
 
-1. Read the post carefully to identify its key themes: collaboration, innovation, achievements, mindset.
-2. Observe the style and tone of the example comments—aim for a similarly natural and personal voice.
-3. Write a concise, engaging comment in ${fullLanguagePost}.
+1. Carefully read the LinkedIn post to understand its key themes (e.g., collaboration, innovation, milestones, mindset).
+2. Pay close attention to the tone, style, and voice of the example comments. You must replicate that tone to blend in naturally.
+3. Write a short, conversational LinkedIn comment in ${fullLanguagePost}.
+4. Speak in the first person, as if you're genuinely reacting or contributing.
+5. Avoid any robotic or generic phrasing.
 
-# Output Format
-- A single LinkedIn comment, 1–2 sentences long.
-- Written in a warm, friendly tone that feels human.
-- Must match the language of the original post.
+### Output Format
 
-# Notes
-- Use everyday punctuation (periods, commas) instead of double hyphens or unnatural separators.
-- Avoid language patterns that feel AI-generated (e.g., overuse of emojis, stock phrases, or formulaic expressions).
-- The goal is to blend in naturally with real LinkedIn comments while being thoughtful and relevant.`,
+- A single LinkedIn comment (1–2 sentences max).
+- Warm, personal, friendly — never formal or overdone.
+- Use normal punctuation (periods, commas), no double hyphens or ellipses.
+- Avoid cliché phrases, emojis, or patterns that feel AI-generated.
+- Your goal is to sound exactly like a real human who’s part of the conversation.`,
       },
-      //     {
-      //       role: "system",
-      //       content: `# IMPORTANT
-      // If the post is in English, reply in English.
-      // If the post is in French, reply in French.
-      // If the post is in Spanish, reply in Spanish.
-      // Ignore the language of the profile or the examples—always follow the post's language.`,
-      //     },
       ...exampleMessages, // keep these only if you control them per language
       {
         role: "user",
@@ -134,12 +126,19 @@ export async function POST(req: Request) {
 
   if (!(await isUnipileAccountConnected(account_id))) {
     console.log("Account not connected");
-    await sendMail("ia.school.app@gmail.com", "Auto commenter account problem", `Hey, 
+    await sendMail(
+      "ia.school.app@gmail.com",
+      "Auto commenter account problem",
+      `Hey, 
 There was a problem accessing to your Linkedin account to generate new comments. Please connect to https://auto-commenter.vercel.app/dashboard to fix the issue.
 
 Best regards,
-Pierre`);    
-    return NextResponse.json({ error: "Account not connected" }, { status: 401 });
+Pierre`
+    );
+    return NextResponse.json(
+      { error: "Account not connected" },
+      { status: 401 }
+    );
   }
 
   const { data: keywords, error: keywordsError } = await supabase
