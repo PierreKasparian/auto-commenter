@@ -20,7 +20,7 @@ export default async function Home() {
     //   }),
     // });
   
-    await fetch("http://localhost:3000/api/cron", {
+    await fetch("https://auto-commenter.vercel.app/api/cron", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${process.env.CRON_SECRET}`,

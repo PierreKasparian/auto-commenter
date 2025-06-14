@@ -9,7 +9,7 @@ import {
   getProviderId,
   getUserComments,
 } from "@/utils/unipile/queries";
-import { qdrantSavePost } from "@/utils/qdrant/queries";
+import { qdrantSavePost, retrieveQdrantCom } from "@/utils/qdrant/queries";
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
@@ -120,6 +120,7 @@ export async function GET(req: Request) {
         console.log("Successfully inserted task:", data);
       }
 
+      console.log(await retrieveQdrantCom())
       //mise à jour des commentaires
       const provider_id = await getProviderId(account.id);
       const comments = await getUserComments(account.id, provider_id);
