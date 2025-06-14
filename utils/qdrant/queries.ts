@@ -11,9 +11,9 @@ const client = new QdrantClient({
 export async function retrieveQdrantCom(vectorSearch?: {
   queryVector: number[];
   limit?: number;
-  unipile_id?:string
+  unipile_id?: string;
 }) {
-  const unipileId = vectorSearch?.unipile_id ?? await getUnipileId();
+  const unipileId = vectorSearch?.unipile_id ?? (await getUnipileId());
   let results;
   if (vectorSearch) {
     results = await client.search("comment_history", {
@@ -30,7 +30,9 @@ export async function retrieveQdrantCom(vectorSearch?: {
         ],
       },
     });
-    const commentList:string[] = results.map(result => result.payload?.comment) as string[];
+    const commentList: string[] = results.map(
+      (result) => result.payload?.comment
+    ) as string[];
     return commentList;
   } else {
     results = await client.scroll("comment_history", {
@@ -70,26 +72,48 @@ export async function qdrantSavePost(
   comment: string,
   unipile_id?: string
 ) {
-  console.log('post!!')
+  console.log("post!!");
   console.log(post);
-  console.log('comment!!')
+  console.log("comment!!");
   console.log(comment);
 
   const unipileId = unipile_id || (await getUnipileId());
-  const res = await client.upsert("comment_history", {
-    points: [
-      {
-        id: Number(new Date().getTime()),
-        payload: { post: post, comment: comment, unipile_id: unipileId },
-        vector: await vectorize(post),
-      },
-    ],
-    wait: true,
+  const existing = await client.search("comment_history", {
+    vector: await vectorize(post),
+    limit: 1,
+    filter: {
+      must: [
+        {
+          key: "post",
+          match: {
+            value: post,
+          },
+        },
+        {
+          key: "unipile_id",
+          match: {
+            value: unipileId,
+          },
+        },
+      ],
+    },
   });
-  if (!(res.status === "completed" || res.status === "acknowledged")) {
-    console.log('problemo')
-    redirect(getErrorRedirect("/dashboard", "Failed to save post"));
-  }
+
+  if (existing.length === 0) {
+    const res = await client.upsert("comment_history", {
+      points: [
+        {
+          id: Number(new Date().getTime()),
+          payload: { post: post, comment: comment, unipile_id: unipileId },
+          vector: await vectorize(post),
+        },
+      ],
+      wait: true,
+    });
+    if (!(res.status === "completed" || res.status === "acknowledged")) {
+      redirect(getErrorRedirect("/dashboard", "Failed to save post"));
+    }
+  }else console.log("post already exists")
   return { success: true };
 }
 
@@ -104,8 +128,10 @@ export async function qdrantDelPost(id: number | string) {
   return { success: true };
 }
 
-export async function qdrantUpdateUnipileId(former_id:string,unipile_id: string){
-  
+export async function qdrantUpdateUnipileId(
+  former_id: string,
+  unipile_id: string
+) {
   // Étape 1 : Récupérer les points avec unipile_id = "caca"
   const pointsToUpdate = await client.scroll("comment_history", {
     limit: 10000, // adapte selon le volume
@@ -113,7 +139,7 @@ export async function qdrantUpdateUnipileId(former_id:string,unipile_id: string)
     filter: {
       must: [
         {
-          key: 'unipile_id',
+          key: "unipile_id",
           match: {
             value: former_id,
           },
@@ -125,7 +151,7 @@ export async function qdrantUpdateUnipileId(former_id:string,unipile_id: string)
   const pointIds = pointsToUpdate.points.map((pt) => pt.id);
 
   if (pointIds.length === 0) {
-    console.log('Aucun point à mettre à jour');
+    console.log("Aucun point à mettre à jour");
     return;
   }
 

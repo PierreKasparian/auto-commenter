@@ -1,16 +1,21 @@
-export const maxDuration = 60; // This function can run for a maximum of 5 seconds
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createClient, PostgrestError } from "@supabase/supabase-js";
 import { FilterTimezoneReq } from "@/types";
 import { getTimezoneOffsetInMinutes } from "@/utils/helpers";
+import {
+  getPostFromId,
+  getProviderId,
+  getUserComments,
+} from "@/utils/unipile/queries";
+import { qdrantSavePost } from "@/utils/qdrant/queries";
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
 
 const generateRandomTime = (timezone: string) => {
   const time = new Date();
@@ -78,7 +83,10 @@ export async function GET(req: Request) {
         continue;
       }
 
-      if (user_timezone.end_trial && new Date(user_timezone.end_trial) < new Date()) {
+      if (
+        user_timezone.end_trial &&
+        new Date(user_timezone.end_trial) < new Date()
+      ) {
         console.log("Trial ended for account", account.id);
         return NextResponse.json({ error: "Trial ended" }, { status: 401 });
       }
@@ -97,12 +105,12 @@ export async function GET(req: Request) {
               unipile_id: account.id,
               comment_time: formattedTime,
               created_at: new Date().toISOString(),
-              done:false
+              done: false,
             },
           ],
           {
             onConflict: "unipile_id",
-            ignoreDuplicates: false
+            ignoreDuplicates: false,
           }
         );
 
@@ -110,6 +118,17 @@ export async function GET(req: Request) {
         console.error("Error inserting into Supabase:", upsertError);
       } else {
         console.log("Successfully inserted task:", data);
+      }
+
+      //mise à jour des commentaires
+      const provider_id = await getProviderId(account.id);
+      const comments = await getUserComments(account.id, provider_id);
+      for (const comment of comments.items) {
+        if (comment.text.length > 10) {
+          const post = await getPostFromId(comment.post_urn, account.id);
+          await qdrantSavePost(post.text, comment.text, account.id);
+          await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
+        }
       }
     } catch (error) {
       console.log(error);

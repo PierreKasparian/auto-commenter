@@ -20,15 +20,15 @@ export default async function Home() {
     //   }),
     // });
   
-    // await fetch("http://localhost:3000/api/cron", {
-    //   method: "GET",
-    //   headers: {
-    //     Authorization: `Bearer ${process.env.CRON_SECRET}`,
-    //   },
-    //   // body: JSON.stringify({
-    //   //   account_id: "XSa0OZUISp-XvvZCmdCpog"
-    //   // }),
-    // });
+    await fetch("http://localhost:3000/api/cron", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.CRON_SECRET}`,
+      },
+      // body: JSON.stringify({
+      //   account_id: "XSa0OZUISp-XvvZCmdCpog"
+      // }),
+    });
   }
   const supabase = await createClient();
   const { data: user } = await supabase.auth.getUser();
