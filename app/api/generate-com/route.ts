@@ -27,7 +27,7 @@ async function generateComment(
   console.log("fullLanguagePost", fullLanguagePost);
   const exampleCom = (await retrieveQdrantCom({
     queryVector: await vectorize(post),
-    limit: 5,
+    limit: 7,
     unipile_id,
   })) as string[];
 
@@ -35,6 +35,8 @@ async function generateComment(
     role: "assistant" as const,
     content: comment,
   }));
+  console.log("exampleMessages");
+  console.log(exampleMessages)
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
     messages: [
@@ -74,10 +76,10 @@ async function generateComment(
       {
         role: "user",
         content: `### My LinkedIn account description:
-  ${profileDescription}
+${profileDescription}
   
-  ## Post to Comment On (IN ${fullLanguagePost.toUpperCase()}):
-  "${post}"`,
+## Post to Comment On (IN ${fullLanguagePost.toUpperCase()}):
+"${post}"`,
       },
     ],
     temperature: 1,
@@ -122,7 +124,7 @@ const detectlanguage = new DetectLanguage(process.env.DETECT_LANGUAGE_API_KEY!);
 
 export async function POST(req: Request) {
   const body = await req.json();
-  console.log(body);
+  // console.log(body);
   if (
     req.headers.get("Authorization") !== `Bearer ${process.env.TRIG_TASK_KEY}`
   ) {
@@ -192,7 +194,7 @@ Pierre`);
   //   const textLengthB = b.text ? b.text.length : 0;
   //   return textLengthB - textLengthA;
   // });
-  console.log(posts);
+  // console.log(posts);
   // return Next/Response.json({ok:true});
   console.log(
     "\n--------------------------------------\n\n" +
@@ -258,7 +260,7 @@ Pierre`);
           languagePost[0].language
         );
         if (!response.error) n_commments++;
-        console.log(response);
+        // console.log(response);
       }
     }
   }

@@ -3,11 +3,10 @@ import { redirect } from "next/navigation";
 import {
   getErrorRedirect,
   getStatusRedirect,
-  waitRandomTime,
 } from "../helpers";
 import { qdrantSavePost, qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
-import { delCommentProposal, getUnipileId } from "../supabase/queries";
+import {  getUnipileId } from "../supabase/queries";
 
 export async function getPostFromId(postId: string, unipileId: string) {
   console.log("postID : ", postId, "unipileId", unipileId);

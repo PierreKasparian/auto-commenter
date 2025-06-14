@@ -4,6 +4,8 @@ import { useState } from "react"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import type { QdrantSearchResult } from "@/types"
+import { redirectToPath } from "@/utils/supabase/server"
+import { getStatusRedirect } from "@/utils/helpers"
 
 interface CommentCardProps {
   example: QdrantSearchResult
@@ -18,7 +20,10 @@ export function CommentCard({ example, deleteCommentExample }: CommentCardProps)
   const handleDelete = async () => {
     try {
       setIsDeleting(true)
-      await deleteCommentExample(example.id)
+      const result = await deleteCommentExample(example.id)
+      if (result.success) {
+        redirectToPath(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully deleted"))
+      }
     } catch (error) {
       console.error("Failed to delete comment example:", error)
     } finally {
