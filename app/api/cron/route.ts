@@ -120,7 +120,7 @@ export async function GET(req: Request) {
         console.log("Successfully inserted task:", data);
       }
 
-      console.log(await retrieveQdrantCom())
+      // console.log(await retrieveQdrantCom())
       //mise à jour des commentaires
       const provider_id = await getProviderId(account.id);
       const comments = await getUserComments(account.id, provider_id);

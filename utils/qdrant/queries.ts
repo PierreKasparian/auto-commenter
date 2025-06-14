@@ -78,9 +78,9 @@ export async function qdrantSavePost(
   console.log(comment);
 
   const unipileId = unipile_id || (await getUnipileId());
-  const existing = await client.search("comment_history", {
-    vector: await vectorize(post),
-    limit: 1,
+  const existing = await client.scroll("comment_history", {
+    limit: 1, // Nombre maximum de points à récupérer
+    with_payload: true, // Inclure les payloads dans la réponse
     filter: {
       must: [
         {
@@ -99,7 +99,8 @@ export async function qdrantSavePost(
     },
   });
 
-  if (existing.length === 0) {
+
+  if (existing.points.length === 0) {
     const res = await client.upsert("comment_history", {
       points: [
         {
