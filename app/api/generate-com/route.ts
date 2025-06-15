@@ -155,7 +155,7 @@ export async function POST(req: Request) {
     );
     console.log("Account not connected");
     await sendMail(
-      data.user?.email!,
+      data.user?.email ?? "",
       // "pierre.kasparian@utt.fr",
       "Auto commenter account problem",
       `Hey, 
