@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
 import { OpenAI } from "openai";
-import { ExampleComment } from "@/types";
+import { ExampleComment, KeywordsTable } from "@/types";
 import { isUnipileAccountConnected, languagesSupported } from "@/utils/helpers";
 import { sendMail } from "@/utils/mailer/queries";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -123,11 +124,39 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const account_id = body.account_id;
+  const { data: keywords, error: keywordsError } = await supabase
+    .from("keywords")
+    .select(
+      "keywords, unipile_id(user_id,com_per_day_max, profile_description)"
+    )
+    .eq("unipile_id", account_id)
+    .single();
 
+  console.log(keywords);
+  // return
+  if (keywordsError) {
+    console.log("kw err");
+    console.log(keywordsError);
+  }
+  if (!keywords) return;
   if (!(await isUnipileAccountConnected(account_id))) {
+    const adminAuthClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    ).auth.admin;
+    const { data, error } = await adminAuthClient.getUserById(
+      (keywords as unknown as KeywordsTable).unipile_id.user_id
+    );
     console.log("Account not connected");
     await sendMail(
-      "ia.school.app@gmail.com",
+      data.user?.email!,
+      // "pierre.kasparian@utt.fr",
       "Auto commenter account problem",
       `Hey, 
 There was a problem accessing to your Linkedin account to generate new comments. Please connect to https://auto-commenter.vercel.app/dashboard to fix the issue.
@@ -140,19 +169,6 @@ Pierre`
       { status: 401 }
     );
   }
-
-  const { data: keywords, error: keywordsError } = await supabase
-    .from("keywords")
-    .select("keywords, unipile_id(com_per_day_max, profile_description)")
-    .eq("unipile_id", account_id)
-    .single();
-
-  console.log(keywords);
-  if (keywordsError) {
-    console.log("kw err");
-    console.log(keywordsError);
-  }
-  if (!keywords) return;
 
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
