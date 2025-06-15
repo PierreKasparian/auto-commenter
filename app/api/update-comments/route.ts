@@ -22,4 +22,5 @@ export async function POST(req: Request) {
       await qdrantSavePost(post.text, comment.text, account_id);
     }
   }
+  return NextResponse.json({ ok: true });
 }

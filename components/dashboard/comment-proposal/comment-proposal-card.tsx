@@ -8,8 +8,7 @@ import type { CommentProposal } from "@/types"
 import { Textarea } from "@/components/ui/textarea"
 import { delCommentProposal } from "@/utils/supabase/queries"
 import { acceptComment } from "@/utils/supabase/queries"
-import { redirectToPath } from "@/utils/supabase/server"
-import { getStatusRedirect } from "@/utils/helpers"
+import { toastStatusPop, toastErrorPop } from "@/utils/helpers"
 
 interface CommentProposalCardProps {
   proposal: CommentProposal
@@ -25,11 +24,15 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
       setIsProcessing(true)
       setActionType("accept")
       console.log(commentIA)
-      await acceptComment(proposal.id,proposal.unipile_id.user_timezone.timezone)
-
+      const result = await acceptComment(proposal.id,proposal.unipile_id.user_timezone.timezone)
+      if (result.success) {
+        toastStatusPop("Success ! 🎉", "Your comment has been successfully accepted")
+      }else{
+        toastErrorPop("Error", "Failed to accept comment")
+      }
     } catch (error) {
       console.error("Failed to accept comment:", error)
-
+      toastErrorPop("Error", "Failed to accept comment")
     } finally {
       setIsProcessing(false)
       setActionType(null)
@@ -40,11 +43,15 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
     try {
       setIsProcessing(true)
       setActionType("reject")
-      await delCommentProposal(proposal.id)
-      redirectToPath(getStatusRedirect('/dashboard',"Success ! 🎉", "Your comment has been successfully rejected"));
+      const result = await delCommentProposal(proposal.id)
+      if (result.success) {
+        toastStatusPop("Success ! 🎉", "Your comment has been successfully rejected")
+      }else{
+        toastErrorPop("Error", "Failed to reject comment")
+      }
     } catch (error) {
       console.error("Failed to reject comment:", error)
-
+      toastErrorPop("Error", "Failed to reject comment")
     } finally {
       setIsProcessing(false)
       setActionType(null)

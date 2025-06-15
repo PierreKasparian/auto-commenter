@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { saveKeywords } from "@/utils/supabase/queries"
+import { toastStatusPop, toastErrorPop } from "@/utils/helpers"
 
 export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: string[]}) {
   const [keywords, setKeywords] = useState<string[]>(kw)
@@ -33,7 +34,14 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
     }
   }
 
-
+  const handleSave = async () => {
+    const result = await saveKeywords(keywords, unipileId)
+    if (result.success) {
+      toastStatusPop("Success ! 🎉", "Your keywords have been successfully saved")
+    }else{
+      toastErrorPop("Error", "Failed to save keywords")
+    }
+  }
 
   return (
     <Card className="w-full">
@@ -81,7 +89,7 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
       </CardContent>
       <CardFooter className="flex justify-between">
         <Button variant="outline" onClick={() => setKeywords([])}>Reset</Button>
-        <Button type="button" onClick={() => saveKeywords(keywords, unipileId)}>Save Configuration</Button>
+        <Button type="button" onClick={() => handleSave()}>Save Configuration</Button>
       </CardFooter>
     </Card>
   )

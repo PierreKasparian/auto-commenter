@@ -26,6 +26,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { saveLanguages } from "@/utils/supabase/queries";
 import { languagesSupported } from "@/utils/helpers";
+import { toastStatusPop, toastErrorPop } from "@/utils/helpers";
 
 export default function LanguageChoose({
   unipileId,
@@ -48,6 +49,14 @@ export default function LanguageChoose({
     setLanguages(languages.filter((language) => language !== languageToRemove));
   };
 
+  const handleSave = async () => {
+    const result = await saveLanguages(languages, unipileId)
+    if (result.success) {
+      toastStatusPop("Success ! 🎉", "Your languages have been successfully saved")
+    }else{
+      toastErrorPop("Error", "Failed to save languages")
+    }
+  }
 
   return (
     <Card className="w-full">
@@ -111,7 +120,7 @@ export default function LanguageChoose({
         <Button variant="outline" onClick={() => setLanguages([])}>Reset</Button>
         <Button
           type="button"
-          onClick={() => saveLanguages(languages, unipileId)}
+          onClick={() => handleSave()}
         >
           Save Configuration
         </Button>

@@ -51,15 +51,10 @@ export const saveKeywords = async (keywords: string[], unipileId: string) => {
     { onConflict: "unipile_id", ignoreDuplicates: false }
   );
   if (error) {
-    redirect(getErrorRedirect("/dashboard", error.message));
+    console.log(error);
+    return {success:false}
   }
-  redirect(
-    getStatusRedirect(
-      "/dashboard",
-      "Success ! 🎉",
-      "Your keywords have been successfully saved"
-    )
-  );
+  return {success:true}
 };
 
 export const getKeywords = async () => {
@@ -99,8 +94,10 @@ export async function delCommentProposal(id: string,supabase?: SupabaseClient<an
   console.log("delete data")
   console.log(data)
   if (error) {
-    redirect(getErrorRedirect("/dashboard", "Erreur,", error.message));
+    console.log(error)
+    return {success:false}
   }
+  return {success:true}
 }
 
 
@@ -150,8 +147,8 @@ export const saveLanguages = async (languages : string[],unipileId : string)=>{
     .update({ langues: languages })
     .eq("unipile_id", unipileId)
     .single();
-  if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
-  redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your languages have been successfully updated"));
+  if (error) return {success:false}
+  return {success:true}
 }
 
 export async function acceptComment(
@@ -165,10 +162,10 @@ export async function acceptComment(
     const supabase = await createClient();
     const postTime = getRandomPostTime(timezone)
     const {error} = await supabase.from('comment_proposal').update({post_time:postTime}).eq('id',id)
-    if(error) redirect(getErrorRedirect("/dashboard", "Failed to accept comment", error.message));
-    redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully accepted"));
+    if(error) return {success:false}
+    return {success:true}
   }
-  redirect(getErrorRedirect("/dashboard", "Failed to accept comment"));
+  return {success:false}
 }
 
 export const isTrialEnded = async (unipile_id: string|null) => {
