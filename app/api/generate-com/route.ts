@@ -150,7 +150,7 @@ export async function POST(req: Request) {
         },
       }
     ).auth.admin;
-    const { data, error } = await adminAuthClient.getUserById(
+    const { data } = await adminAuthClient.getUserById(
       (keywords as unknown as KeywordsTable).unipile_id.user_id
     );
     console.log("Account not connected");
