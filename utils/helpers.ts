@@ -289,3 +289,16 @@ export const getRandomPostTime = (timezone: string) => {
   return timeofTimezone.toString().slice(0, -5);
 };
 
+export const toastStatusPop = (status: string, status_description: string) => {
+  //client side
+  const currentUrl = window.location.href;
+  const newUrl = getStatusRedirect(currentUrl, status, status_description);
+  window.history.pushState({}, "", newUrl);
+};
+
+export const toastErrorPop = (error: string, error_description: string) => {
+  //client side
+  const currentUrl = window.location.href;
+  const newUrl = getErrorRedirect(currentUrl, error, error_description);
+  window.history.pushState({}, "", newUrl);
+};

@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { qdrantSavePost } from "@/utils/qdrant/queries"
-import { getErrorRedirect, getStatusRedirect } from "@/utils/helpers";
-import { redirectToPath } from "@/utils/supabase/server";
+import { toastStatusPop, toastErrorPop } from "@/utils/helpers";
 
 export function AddCommentForm() {
   const [text, setText] = useState("");
@@ -26,13 +25,13 @@ export function AddCommentForm() {
       setIsSubmitting(true);
       const res = await qdrantSavePost(post, text)
       if (res.success) {
-        redirectToPath(getStatusRedirect("/dashboard", "Success ! 🎉", "Your comment has been successfully saved"))
+        toastStatusPop("Success ! 🎉", "Your comment has been successfully saved")
       }
       // Reset form
       setText("");
       setPost("");
     } catch (error) {
-      redirectToPath(getErrorRedirect("/dashboard", (error as Error).message))
+      toastErrorPop("Error", (error as Error).message)
     } finally {
       setIsSubmitting(false);
     }

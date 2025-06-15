@@ -1,19 +1,21 @@
+"use client"
 
-// const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-// import { sendMail } from "@/utils/helpers";
-// import nodemailer from "nodemailer";
-// import { createClient } from "@/utils/supabase/server";
 
-// import { qdrantSavePost } from "@/utils/qdrant/queries";
+import { Button } from "@/components/ui/button";
+import { toastStatusPop } from "@/utils/helpers";
 
-// import { qdrantUpdateUnipileId } from "@/utils/qdrant/queries";
+const page = () => {
+  // const router = useRouter()
 
-// import { postComment } from "@/utils/unipile/queries";
-const page = async () => {
-            // await qdrantSavePost("post", "comment", "account_id");
-  
-// await qdrantUpdateUnipileId("XSa0OZUISp-XvvZCmdCpog","Rw8U1_lMT8OhFGJNuwW4Iw")
-  return <div>comment posted</div>;
+  // useEffect(() => {
+  //   const currentUrl = window.location.href;
+  //   const newUrl = `${currentUrl}?status=Success&status_description=Subscription successful`;
+  //   window.history.pushState({}, '', newUrl);
+  //   router.replace(newUrl);
+  // }, []);
+
+  return <div className=""><br /><div className="h-screen"><br />
+  comment posted</div><Button onClick={() => { toastStatusPop("Success", "Subscription successful") }}>Test</Button></div>;
 };
 
-export default page;
+export default page

@@ -4,12 +4,18 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useState } from "react"
+import { toastStatusPop, toastErrorPop } from "@/utils/helpers"
 
 const ProfileDescriptionForm = ({profileDesc}: {profileDesc: string}) => {
   const [profileDescription, setProfileDescription] = useState<string>(profileDesc)
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
-      await editProfileDescription(profileDescription)
+      const result = await editProfileDescription(profileDescription)
+      if (result.success) {
+        toastStatusPop("Success ! 🎉", "Your profile description has been successfully updated")
+      }else{
+        toastErrorPop("Error", "Failed to update profile description")
+      }
     }
     return (
     <form onSubmit={handleSubmit} className="space-y-2 px-6 mt-4">

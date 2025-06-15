@@ -126,8 +126,8 @@ export const editProfileDescription = async (profileDescription : string)=>{
     .update({ profile_description: profileDescription })
     .eq("user_id", user_id)
     .single();
-  if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
-  redirect(getStatusRedirect("/dashboard", "Success ! 🎉", "Your profile description has been successfully updated"));
+  if (error) return {success:false}
+  return {success:true}
 }
 
 export const getLanguages = async () => {

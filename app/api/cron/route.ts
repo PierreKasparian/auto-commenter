@@ -5,11 +5,9 @@ import { createClient, PostgrestError } from "@supabase/supabase-js";
 import { FilterTimezoneReq } from "@/types";
 import { getTimezoneOffsetInMinutes } from "@/utils/helpers";
 import {
-  getPostFromId,
   getProviderId,
   getUserComments,
 } from "@/utils/unipile/queries";
-import { qdrantSavePost } from "@/utils/qdrant/queries";
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min);
@@ -124,13 +122,13 @@ export async function GET(req: Request) {
       //mise à jour des commentaires
       const provider_id = await getProviderId(account.id);
       const comments = await getUserComments(account.id, provider_id);
-      for (const comment of comments.items) {
-        if (comment.text.length > 10) {
-          const post = await getPostFromId(comment.post_urn, account.id);
-          await qdrantSavePost(post.text, comment.text, account.id);
-          await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
-        }
-      }
+      fetch("/api/update-comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ account_id: account.id, comments }),
+      });
     } catch (error) {
       console.log(error);
     }

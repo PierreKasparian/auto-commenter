@@ -124,7 +124,7 @@ export async function qdrantDelPost(id: number | string) {
     wait: true,
   });
   if (!(res.status === "completed" || res.status === "acknowledged")) {
-    redirect(getErrorRedirect("/dashboard", "Failed to delete post"));
+    return { success: false };
   }
   return { success: true };
 }
