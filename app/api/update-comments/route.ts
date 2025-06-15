@@ -14,9 +14,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json();
-  const { account_id,comments } = body;
+  const { account_id,comments,profile_name } = body;
   for (const comment of comments.items) {
-    if (comment.text.length > 10) {
+    if (comment.text.length > 10 && comment.author === profile_name) {
       await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated
       const post = await getPostFromId(comment.post_urn, account_id);
       await qdrantSavePost(post.text, comment.text, account_id);

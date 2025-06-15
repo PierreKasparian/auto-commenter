@@ -16,6 +16,7 @@ export interface FilterTimezoneReq {
         timezone: string;
         created_at: string;
     }
+    profile_name: string;
 }
 
 export interface LinkedInPost {

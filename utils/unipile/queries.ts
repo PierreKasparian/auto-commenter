@@ -1,12 +1,9 @@
 "use server";
 import { redirect } from "next/navigation";
-import {
-  getErrorRedirect,
-  getStatusRedirect,
-} from "../helpers";
+import { getErrorRedirect, getStatusRedirect } from "../helpers";
 import { qdrantSavePost, qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
-import {  getUnipileId } from "../supabase/queries";
+import { getUnipileId } from "../supabase/queries";
 
 export async function getPostFromId(postId: string, unipileId: string) {
   console.log("postID : ", postId, "unipileId", unipileId);
@@ -68,7 +65,7 @@ export async function getUserComments(unipileId: string, provider_id: string) {
   };
 
   const comments = await fetch(
-    `https://api1.unipile.com:13115/api/v1/users/${provider_id}/comments?account_id=${unipileId}`,
+    `https://api1.unipile.com:13115/api/v1/users/${provider_id}/comments?limit=100&account_id=${unipileId}`,
     comRequestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -96,7 +93,10 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
   );
   const result = await response.json();
   console.log(result);
-  return result.headline;
+  return {
+    profileDescription: result.headline,
+    profileName: result.first_name + " " + result.last_name,
+  };
 }
 
 export async function linkedinConnect(accessToken: string, userAgent: string) {
@@ -122,10 +122,9 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
     "https://api1.unipile.com:13115/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
-  await new Promise((resolve) => setTimeout(resolve, 10000));
+  await new Promise((resolve) => setTimeout(resolve, 7000));
   console.log(response);
   const result = await response.json();
-  let provider_id;
   if (result.object == "AccountCreated") {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();
@@ -137,9 +136,9 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
       console.log("No user");
       redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
     }
-    provider_id = await getProviderId(result.account_id);
+    const provider_id = await getProviderId(result.account_id);
     console.log("provider_id", provider_id);
-    const profileDescription = await getProfilDesc(
+    const { profileDescription, profileName } = await getProfilDesc(
       result.account_id,
       provider_id
     );
@@ -147,37 +146,39 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
     const { error: unipileError } = await supabase.from("unipile_id").insert({
       unipile_id: result.account_id,
       user_id: data.user.id,
-      com_per_day_max: 2, //a changer
+      com_per_day_max: 5, //a changer
       profile_description: profileDescription ?? "",
+      profile_name: profileName,
     });
     if (unipileError) {
       console.log(unipileError);
       redirect(getErrorRedirect("/dashboard", "No user", unipileError.message));
     }
-  }
 
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  try {
-    const comments = await getUserComments(result.account_id, provider_id);
-    console.log("comments", comments);
-    for (const comment of comments.items) {
-      if (comment.text.length > 10) {
-        const post = await getPostFromId(comment.post_urn, result.account_id);
-        await qdrantSavePost(post.text, comment.text, result.account_id);
-        await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    try {
+      const comments = await getUserComments(result.account_id, provider_id);
+      console.log("comments", comments);
+      for (const comment of comments.items) {
+        if (comment.text.length > 10 && comment.author === profileName) {
+          const post = await getPostFromId(comment.post_urn, result.account_id);
+          await qdrantSavePost(post.text, comment.text, result.account_id);
+          await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
+        }
       }
+    } catch (error) {
+      console.log(error);
+      redirect(getErrorRedirect("/dashboard", "Error", "Error retrieving your comments"));
     }
-  } catch (error) {
-    console.log(error);
-    redirect(getErrorRedirect("/dashboard", (error as Error).message));
+    redirect(
+      getStatusRedirect(
+        "/dashboard",
+        "Success ! 🎉",
+        "Your account has been successfully connected"
+      )
+    );
   }
-  redirect(
-    getStatusRedirect(
-      "/dashboard",
-      "Success ! 🎉",
-      "Your account has been successfully connected"
-    )
-  );
+  redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
 }
 
 export const getUnipileReconnectUrl = async (unipile_id: string) => {
@@ -250,8 +251,11 @@ export async function postComment(
   console.log(res);
 }
 
-export async function fuckUnipile(accessToken: string, userAgent: string, unipile_id?: string) {
-
+export async function fuckUnipile(
+  accessToken: string,
+  userAgent: string,
+  unipile_id?: string
+) {
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
@@ -276,7 +280,7 @@ export async function fuckUnipile(accessToken: string, userAgent: string, unipil
   await new Promise((resolve) => setTimeout(resolve, 5000));
   console.log(response);
   const result = await response.json();
-  await qdrantUpdateUnipileId(unipile_id!,result.account_id);
+  await qdrantUpdateUnipileId(unipile_id!, result.account_id);
   if (result.object == "AccountCreated") {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();
