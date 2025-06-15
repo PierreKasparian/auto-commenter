@@ -122,10 +122,11 @@ export async function GET(req: Request) {
       //mise à jour des commentaires
       const provider_id = await getProviderId(account.id);
       const comments = await getUserComments(account.id, provider_id);
-      fetch("/api/update-comments", {
+      fetch(process.env.NODE_ENV === "development" ? "http://localhost:3000/api/update-comments" : "https://auto-commenter.vercel.app/api/update-comments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.CRON_SECRET}`,
         },
         body: JSON.stringify({ account_id: account.id, comments }),
       });
