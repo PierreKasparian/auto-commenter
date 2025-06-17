@@ -1,5 +1,6 @@
 export const maxDuration = 60;
-
+import { sendMail } from "@/utils/mailer/queries";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import { getProviderId } from "./unipile/queries";
 
 const toastKeyMap: { [key: string]: string[] } = {
@@ -302,3 +303,34 @@ export const toastErrorPop = (error: string, error_description: string) => {
   const newUrl = getErrorRedirect(currentUrl, error, error_description);
   window.history.pushState({}, "", newUrl);
 };
+
+export const checkAccountConnected=async(user_id : string,account_id:string)=>{
+  if (!(await isUnipileAccountConnected(account_id))) {
+    const adminAuthClient = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false,
+        },
+      }
+    ).auth.admin;
+    const { data } = await adminAuthClient.getUserById(
+      user_id
+    );
+    console.log("Account not connected");
+    await sendMail(
+      data.user?.email ?? "",
+      // "pierre.kasparian@utt.fr",
+      "Auto commenter account problem",
+      `Hey, 
+There was a problem accessing to your Linkedin account to generate new comments. Please connect to https://auto-commenter.vercel.app/dashboard to fix the issue.
+
+Best regards,
+Pierre`
+    );
+    return false;
+  }
+  return true;
+}

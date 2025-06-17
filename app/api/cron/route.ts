@@ -71,7 +71,7 @@ export async function GET(req: Request) {
       }: { data: FilterTimezoneReq | null; error: PostgrestError | null } =
         await supabase
           .from("unipile_id")
-          .select("unipile_id,end_trial,user_timezone(timezone,created_at),profile_name")
+          .select("unipile_id,user_id,end_trial,user_timezone(timezone,created_at),profile_name")
           .eq("unipile_id", account.id.toString())
           .single();
 
@@ -128,7 +128,7 @@ export async function GET(req: Request) {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.CRON_SECRET}`,
         },
-        body: JSON.stringify({ account_id: account.id, comments, profile_name: user_timezone.profile_name }),
+        body: JSON.stringify({ user_id:user_timezone.user_id,account_id: account.id, comments, profile_name: user_timezone.profile_name }),
       });
     } catch (error) {
       console.log(error);

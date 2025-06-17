@@ -5,6 +5,7 @@ import {
   getPostFromId,
 } from "@/utils/unipile/queries";
 import { qdrantSavePost } from "@/utils/qdrant/queries";
+import { checkAccountConnected } from "@/utils/helpers";
 
 export async function POST(req: Request) {
   // console.log(process.env.N8N_AUTH)
@@ -14,7 +15,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const body = await req.json();
-  const { account_id,comments,profile_name } = body;
+  const { user_id,account_id,comments,profile_name } = body;
+  const isConnected = await checkAccountConnected(user_id,account_id);
+  if (!isConnected) return NextResponse.json(
+    { error: "Account not connected" },
+    { status: 401 }
+  );
   for (const comment of comments.items) {
     if (comment.text.length > 10 && comment.author === profile_name) {
       await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated

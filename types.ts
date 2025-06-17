@@ -14,6 +14,7 @@ export interface KeywordsTable {
 
 export interface FilterTimezoneReq {
   unipile_id: string;
+  user_id: string;
   end_trial: string;
   user_timezone: {
     timezone: string;

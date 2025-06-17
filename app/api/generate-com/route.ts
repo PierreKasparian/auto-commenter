@@ -6,9 +6,8 @@ import { createClient } from "@supabase/supabase-js";
 import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
 import { OpenAI } from "openai";
 import { ExampleComment, KeywordsTable } from "@/types";
-import { isUnipileAccountConnected, languagesSupported } from "@/utils/helpers";
-import { sendMail } from "@/utils/mailer/queries";
-import { createClient as createAdminClient } from "@supabase/supabase-js";
+import { checkAccountConnected, languagesSupported } from "@/utils/helpers";
+
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -83,7 +82,7 @@ ${profileDescription}
     stream: false,
   });
 
-  return response.choices[0]?.message.content?.replace("—", ",");
+  return response.choices[0]?.message.content?.replace("—", ", ");
 }
 
 async function createComment(
@@ -139,37 +138,12 @@ export async function POST(req: Request) {
     console.log(keywordsError);
   }
   if (!keywords) return;
-  if (!(await isUnipileAccountConnected(account_id))) {
-    const adminAuthClient = createAdminClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_SUPABASE_SERVICE_ROLE_KEY!,
-      {
-        auth: {
-          autoRefreshToken: false,
-          persistSession: false,
-        },
-      }
-    ).auth.admin;
-    const { data } = await adminAuthClient.getUserById(
-      (keywords as unknown as KeywordsTable).unipile_id.user_id
-    );
-    console.log("Account not connected");
-    await sendMail(
-      data.user?.email ?? "",
-      // "pierre.kasparian@utt.fr",
-      "Auto commenter account problem",
-      `Hey, 
-There was a problem accessing to your Linkedin account to generate new comments. Please connect to https://auto-commenter.vercel.app/dashboard to fix the issue.
 
-Best regards,
-Pierre`
-    );
-    return NextResponse.json(
-      { error: "Account not connected" },
-      { status: 401 }
-    );
-  }
-
+  const isConnected = await checkAccountConnected((keywords as unknown as KeywordsTable).unipile_id.user_id,account_id);
+  if (!isConnected) return NextResponse.json(
+    { error: "Account not connected" },
+    { status: 401 }
+  );
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
