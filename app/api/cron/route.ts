@@ -37,15 +37,15 @@ export async function GET(req: Request) {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
-  const myHeaders = new Headers();
-  myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
-  myHeaders.append("accept", "application/json");
+  // const myHeaders = new Headers();
+  // myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
+  // myHeaders.append("accept", "application/json");
 
-  const requestOptions = {
-    method: "GET",
-    headers: myHeaders,
-    redirect: "follow",
-  };
+  // const requestOptions = {
+  //   method: "GET",
+  //   headers: myHeaders,
+  //   redirect: "follow",
+  // };
 
   // const accounts = await fetch(
   //   "https://api13.unipile.com:14361/api/v1/accounts",
