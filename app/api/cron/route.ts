@@ -47,37 +47,41 @@ export async function GET(req: Request) {
     redirect: "follow",
   };
 
-  const accounts = await fetch(
-    "https://api13.unipile.com:14361/api/v1/accounts",
-    requestOptions as RequestInit
-  )
-    .then((response) => {
-      return response.json();
-    })
-    .then((result) => {
-      return result.items;
-    })
-    .catch((error) => {
-      console.log(error);
-      return console.error(error);
-    });
-
-  console.log("accounts", accounts);
-  for (const account of accounts) {
+  // const accounts = await fetch(
+  //   "https://api13.unipile.com:14361/api/v1/accounts",
+  //   requestOptions as RequestInit
+  // )
+  //   .then((response) => {
+  //     return response.json();
+  //   })
+  //   .then((result) => {
+  //     return result.items;
+  //   })
+  //   .catch((error) => {
+  //     console.log(error);
+  //     return console.error(error);
+  //   });
+  const {
+    data,
+    error: filterError,
+  }: { data: FilterTimezoneReq[] | null; error: PostgrestError | null } =
+    await supabase
+      .from("unipile_id")
+      .select("unipile_id,user_id,end_trial,user_timezone(timezone,created_at),profile_name")
+      // .eq("unipile_id", account.id.toString())
+      // .single();
+  if (filterError || !data) {
+    console.log("filterError", filterError);
+    return NextResponse.json({ error: "filterError" }, { status: 401 });
+  }
+  console.log("accounts", data);
+  for (const user_timezone of data) {
     try {
-      const {
-        data: user_timezone,
-        error: filterError,
-      }: { data: FilterTimezoneReq | null; error: PostgrestError | null } =
-        await supabase
-          .from("unipile_id")
-          .select("unipile_id,user_id,end_trial,user_timezone(timezone,created_at),profile_name")
-          .eq("unipile_id", account.id.toString())
-          .single();
+
 
       console.log(user_timezone);
       if (!user_timezone || filterError) {
-        console.log("No timezone found for account", account.id);
+        console.log("No timezone found for account", user_timezone.unipile_id);
         continue;
       }
 
@@ -85,7 +89,7 @@ export async function GET(req: Request) {
         user_timezone.end_trial &&
         new Date(user_timezone.end_trial) < new Date()
       ) {
-        console.log("Trial ended for account", account.id);
+        console.log("Trial ended for account", user_timezone.unipile_id);
         return NextResponse.json({ error: "Trial ended" }, { status: 401 });
       }
 
@@ -100,7 +104,7 @@ export async function GET(req: Request) {
         .upsert(
           [
             {
-              unipile_id: account.id,
+              unipile_id: user_timezone.unipile_id,
               comment_time: formattedTime,
               created_at: new Date().toISOString(),
               done: false,
@@ -120,15 +124,15 @@ export async function GET(req: Request) {
 
       // console.log(await retrieveQdrantCom())
       //mise à jour des commentaires
-      const provider_id = await getProviderId(account.id);
-      const comments = await getUserComments(account.id, provider_id);
+      const provider_id = await getProviderId(user_timezone.unipile_id);
+      const comments = await getUserComments(user_timezone.unipile_id, provider_id);
       fetch(process.env.NODE_ENV === "development" ? "http://localhost:3000/api/update-comments" : "https://auto-commenter.vercel.app/api/update-comments", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${process.env.CRON_SECRET}`,
         },
-        body: JSON.stringify({ user_id:user_timezone.user_id,account_id: account.id, comments, profile_name: user_timezone.profile_name }),
+        body: JSON.stringify({ user_id:user_timezone.user_id,account_id: user_timezone.unipile_id, comments, profile_name: user_timezone.profile_name }),
       });
     } catch (error) {
       console.log(error);
