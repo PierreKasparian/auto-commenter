@@ -27,7 +27,7 @@ const ProfileDescriptionForm = ({profileDesc}: {profileDesc: string}) => {
           onChange={(e) => setProfileDescription(e.target.value)}
         />
         <p className="text-xs text-gray-500">
-        The AI will use this profile description to generate more effective comment suggestions. Add information to improve your comments suggestions. This won't appear on your Linkedin profile.</p>
+        The AI will use this profile description to generate more effective comment suggestions. Add information to improve your comments suggestions. This won&apos;t appear on your Linkedin profile.</p>
         <Button
           type="submit"
           className="bg-teal-600 hover:bg-teal-700">

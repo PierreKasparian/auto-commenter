@@ -18,7 +18,7 @@ export async function getPostFromId(postId: string, unipileId: string) {
   };
 
   const post = await fetch(
-    "https://api1.unipile.com:13115/api/v1/posts/" +
+    "https://api13.unipile.com:14361/api/v1/posts/" +
       postId +
       "?account_id=" +
       unipileId,
@@ -42,7 +42,7 @@ export async function getProviderId(unipile_id: string) {
     redirect: "follow",
   };
   const provider_id = await fetch(
-    "https://api1.unipile.com:13115/api/v1/users/me?account_id=" + unipile_id,
+    "https://api13.unipile.com:14361/api/v1/users/me?account_id=" + unipile_id,
     requestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -65,7 +65,7 @@ export async function getUserComments(unipileId: string, provider_id: string) {
   };
 
   const comments = await fetch(
-    `https://api1.unipile.com:13115/api/v1/users/${provider_id}/comments?limit=100&account_id=${unipileId}`,
+    `https://api13.unipile.com:14361/api/v1/users/${provider_id}/comments?limit=100&account_id=${unipileId}`,
     comRequestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -85,7 +85,7 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
   };
 
   const response = await fetch(
-    "https://api1.unipile.com:13115/api/v1/users/" +
+    "https://api13.unipile.com:14361/api/v1/users/" +
       provider_id +
       "?account_id=" +
       unipileId,
@@ -119,7 +119,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   };
 
   const response = await fetch(
-    "https://api1.unipile.com:13115/api/v1/accounts",
+    "https://api13.unipile.com:14361/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
   await new Promise((resolve) => setTimeout(resolve, 7000));
@@ -191,7 +191,7 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
     type: "reconnect",
     providers: "*",
     expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    api_url: "https://api1.unipile.com:13115/api/v1/accounts",
+    api_url: "https://api13.unipile.com:14361/api/v1/accounts",
     reconnect_account: unipile_id,
   });
 
@@ -203,7 +203,7 @@ export const getUnipileReconnectUrl = async (unipile_id: string) => {
   };
 
   const result = await fetch(
-    "https://api1.unipile.com:13115/api/v1/hosted/accounts/link",
+    "https://api13.unipile.com:14361/api/v1/hosted/accounts/link",
     requestOptions as RequestInit
   )
     .then(async (response) => await response.json())
@@ -240,7 +240,7 @@ export async function postComment(
   // await waitRandomTime();
   console.log("comment close to posting..");
   const res = await fetch(
-    "https://api1.unipile.com:13115/api/v1/posts/" +
+    "https://api13.unipile.com:14361/api/v1/posts/" +
       post_id.replaceAll(":", "%3A") +
       "/comments",
     requestOptions as RequestInit
@@ -274,7 +274,7 @@ export async function fuckUnipile(
     redirect: "follow",
   };
   const response = await fetch(
-    "https://api1.unipile.com:13115/api/v1/accounts",
+    "https://api13.unipile.com:14361/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
   await new Promise((resolve) => setTimeout(resolve, 5000));
