@@ -85,9 +85,7 @@ export function HeroSection() {
                         <div className="ml-auto text-xs text-teal-600 font-medium">Automated comment</div>
                       </div>
                       <p className="text-gray-700 text-sm mb-4">
-                        Congratulations on this impressive fundraising! Your work on AI generative is truly inspiring.
-                        I would like to discuss potential applications in our sector.
-                        #AI #innovation
+                        Congrats ! Have you any advice to share about your fundraising ?
                       </p>
                       <div className="flex justify-end space-x-2">
                         <Button

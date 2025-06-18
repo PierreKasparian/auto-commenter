@@ -87,7 +87,7 @@ const DashboardPage = async () => {
                         langues={langues}
                       />
                     </div>
-                    <AccountsChoose unipileId={unipile_id} accounts={accounts} />
+                    {/* <AccountsChoose unipileId={unipile_id} accounts={accounts} /> */}
                     <Separator />
                     <YourTone />
                   </div>

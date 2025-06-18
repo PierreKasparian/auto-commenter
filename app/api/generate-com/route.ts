@@ -46,21 +46,17 @@ async function generateComment(
 
   const userMessage = {
     role: "user" as const,
-    content: `### My LinkedIn account description:
-${profileDescription}
-
-## Post to Comment On (IN ${fullLanguagePost.toUpperCase()}):
-"${post}"`
+    content: post
   } as { role: 'user'; content: string };
 
-  console.log([getSystemPrompt(fullLanguagePost), ...exampleMessages, userMessage]);
+  // console.log([getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage]);
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
-    messages: [getSystemPrompt(fullLanguagePost), ...exampleMessages, userMessage] as {
+    messages: [getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage] as {
       role: 'user' | 'assistant' | 'system';
       content: string;
     }[],
-    temperature: 1,
+    temperature: 0.6,
     max_tokens: 2048,
     top_p: 1,
     frequency_penalty: 0,
@@ -136,6 +132,7 @@ export async function POST(req: Request) {
     .split(" ")
     .join("%20")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
   console.log(linkedInUrl);
+  // return
   const raw = JSON.stringify({
     api: "classic",
     category: "people",

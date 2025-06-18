@@ -15,7 +15,7 @@ export default async function Home() {
     //     Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
     //   },
     //   body: JSON.stringify({
-    //     account_id: "RV53E5inT-GxY3A7OXgBXQ",
+    //     account_id: "Sv6WoXHCQT2yu9P1V0agoQ",
         
     //   }),
     // });
@@ -25,9 +25,9 @@ export default async function Home() {
     //   headers: {
     //     Authorization: `Bearer ${process.env.CRON_SECRET}`,
     //   },
-    //   // body: JSON.stringify({
-    //   //   account_id: "XSa0OZUISp-XvvZCmdCpog"
-    //   // }),
+      // body: JSON.stringify({
+      //   account_id: "XSa0OZUISp-XvvZCmdCpog"
+      // }),
     // });
   }
   const supabase = await createClient();

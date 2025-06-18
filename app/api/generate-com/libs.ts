@@ -1,4 +1,4 @@
-export const getSystemPrompt = (fullLanguagePost: string) => {
+export const getSystemPrompt = (fullLanguagePost: string, profileDescription: string) => {
     return {
     role: "system",
     content: `**Instruction:**  
@@ -21,6 +21,9 @@ Match the tone of the example comments exactly. Your output must feel like it wa
 - Warm, personal, friendly — never formal or overdone.
 - Use normal punctuation (periods, commas), no double hyphens or ellipses.
 - Avoid cliché phrases, emojis, or patterns that feel AI-generated.
-- Your goal is to sound exactly like a real human who’s part of the conversation.`,
+- Your goal is to sound exactly like a real human who’s part of the conversation.
+
+### User LinkedIn account description:
+${profileDescription}`,
   }
 }
