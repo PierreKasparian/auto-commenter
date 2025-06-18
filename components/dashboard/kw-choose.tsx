@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { saveKeywords } from "@/utils/supabase/queries"
+import { saveElt } from "@/utils/supabase/queries"
 import { toastStatusPop, toastErrorPop } from "@/utils/helpers"
 
 export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: string[]}) {
@@ -35,7 +35,7 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
   }
 
   const handleSave = async () => {
-    const result = await saveKeywords(keywords, unipileId)
+    const result = await saveElt(keywords, unipileId, true)
     if (result.success) {
       toastStatusPop("Success ! 🎉", "Your keywords have been successfully saved")
     }else{

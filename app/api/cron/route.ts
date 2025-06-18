@@ -76,6 +76,7 @@ export async function GET(req: Request) {
   }
   console.log("accounts", data);
   for (const user_timezone of data) {
+    
     try {
 
 

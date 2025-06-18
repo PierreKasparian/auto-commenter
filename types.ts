@@ -142,7 +142,23 @@ export interface CommentProposal {
 
 export type CreditAmount = 10 | 20 | 90 | 180;
 
+export type RoleType = "function" | "user" | "assistant" | "system" | "developer" | "tool";
+
 export interface ExampleComment {
-  role: "assistant";
+  role: RoleType;
   content: string;
+  name?: string; // Optional for function messages
+}
+
+export interface AccountNkw {
+  user_id: string;
+  com_per_day_max: number;
+  profile_description: string;
+  accounts?: {accounts:string[]},
+  keywords?: {keywords:string[]};
+}
+
+export interface QdrantCom{
+  comments:string,
+  post:string
 }

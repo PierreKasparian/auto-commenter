@@ -1,9 +1,13 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { getErrorRedirect, getRandomPostTime, getStatusRedirect } from "../helpers";
+import {
+  getErrorRedirect,
+  getRandomPostTime,
+  getStatusRedirect,
+} from "../helpers";
 import { SupabaseClient } from "@supabase/supabase-js";
-
+import { AccountNkw } from "@/types";
 
 export async function signOut() {
   const supabase = await createClient();
@@ -21,7 +25,7 @@ export async function signOut() {
   );
 }
 
-export const getUnipileId = async (): Promise<string|null> => {
+export const getUnipileId = async (): Promise<string | null> => {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   if (error) {
@@ -41,35 +45,58 @@ export const getUnipileId = async (): Promise<string|null> => {
   return unipileData?.[0]?.unipile_id;
 };
 
-export const saveKeywords = async (keywords: string[], unipileId: string) => {
+export const saveElt = async (
+  elt: string[],
+  unipileId: string,
+  isKeywords: boolean
+) => {
   const supabase = await createClient();
-  const { error } = await supabase.from("keywords").upsert(
-    {
-      keywords: keywords,
-      unipile_id: unipileId,
-    },
-    { onConflict: "unipile_id", ignoreDuplicates: false }
-  );
+  const { error } = await supabase
+    .from(isKeywords ? "keywords" : "accounts")
+    .upsert(
+      {
+        [isKeywords ? "keywords" : "accounts"]: elt,
+        unipile_id: unipileId,
+      },
+      { onConflict: "unipile_id", ignoreDuplicates: false }
+    );
   if (error) {
     console.log(error);
-    return {success:false}
+    return { success: false };
   }
-  return {success:true}
+  return { success: true };
 };
 
-export const getKeywords = async () => {
+export const getAccountsNkw = async (
+  unipile_id?: string
+): Promise<AccountNkw> => {
+  let unipileId;
   const supabase = await createClient();
-  const unipileId = await getUnipileId();
-  if (!unipileId) return [];
+  if (!unipile_id) {
+    unipileId = await getUnipileId();
+  } else {
+    unipileId = unipile_id;
+  }
+  let res: AccountNkw = {
+    user_id:"",
+    com_per_day_max: 0,
+    profile_description: "",
+    accounts: { accounts: [] },
+    keywords: { keywords: [] },
+  };
+  if (!unipileId) return res;
   const { data, error } = await supabase
-    .from("keywords")
-    .select("keywords")
-    .eq("unipile_id", unipileId);
+    .from("unipile_id")
+    .select("user_id,com_per_day_max, profile_description,keywords(keywords),accounts(accounts)")
+    .eq("unipile_id", unipileId)
+    .single();
   if (error) {
     console.log(error);
-    return [];
+    return res;
   }
-  return data?.[0]?.keywords ?? [];
+  res = data as unknown as AccountNkw;
+  console.log(res);
+  return res;
 };
 
 export async function getCommentsProposals(id?: string) {
@@ -77,29 +104,34 @@ export async function getCommentsProposals(id?: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("comment_proposal")
-    .select("id,created_at,post_text,post_link,comment_IA,author_name,post_id,unipile_id(user_timezone(timezone))")
-    .eq("unipile_id", unipile_id).is("post_time", null)
-    .order('created_at', { ascending: false });
+    .select(
+      "id,created_at,post_text,post_link,comment_IA,author_name,post_id,unipile_id(user_timezone(timezone))"
+    )
+    .eq("unipile_id", unipile_id)
+    .is("post_time", null)
+    .order("created_at", { ascending: false });
   if (error) console.log(error);
   return data;
 }
 
-export async function delCommentProposal(id: string,supabase?: SupabaseClient<any, "public", any>) {
-  const supabaseClient = supabase ?? await createClient();
-  const { data,error } = await supabaseClient
+export async function delCommentProposal(
+  id: string,
+  supabase?: SupabaseClient<any, "public", any>
+) {
+  const supabaseClient = supabase ?? (await createClient());
+  const { data, error } = await supabaseClient
     .from("comment_proposal")
     .delete()
     .eq("id", id)
     .select();
-  console.log("delete data")
-  console.log(data)
+  console.log("delete data");
+  console.log(data);
   if (error) {
-    console.log(error)
-    return {success:false}
+    console.log(error);
+    return { success: false };
   }
-  return {success:true}
+  return { success: true };
 }
-
 
 export const getProfileDescription = async () => {
   const supabase = await createClient();
@@ -112,9 +144,9 @@ export const getProfileDescription = async () => {
     .single();
   if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
   return data?.profile_description;
-}
+};
 
-export const editProfileDescription = async (profileDescription : string)=>{
+export const editProfileDescription = async (profileDescription: string) => {
   const supabase = await createClient();
   const { data: user } = await supabase.auth.getUser();
   const user_id = user?.user?.id;
@@ -123,9 +155,9 @@ export const editProfileDescription = async (profileDescription : string)=>{
     .update({ profile_description: profileDescription })
     .eq("user_id", user_id)
     .single();
-  if (error) return {success:false}
-  return {success:true}
-}
+  if (error) return { success: false };
+  return { success: true };
+};
 
 export const getLanguages = async () => {
   const supabase = await createClient();
@@ -138,37 +170,40 @@ export const getLanguages = async () => {
     .single();
   if (error) redirect(getErrorRedirect("/dashboard", "Error", error.message));
   return data?.langues;
-}
+};
 
-export const saveLanguages = async (languages : string[],unipileId : string)=>{
+export const saveLanguages = async (languages: string[], unipileId: string) => {
   const supabase = await createClient();
   const { error } = await supabase
     .from("unipile_id")
     .update({ langues: languages })
     .eq("unipile_id", unipileId)
     .single();
-  if (error) return {success:false}
-  return {success:true}
-}
+  if (error) return { success: false };
+  return { success: true };
+};
 
 export async function acceptComment(
   id: string,
-  timezone:string,
+  timezone: string,
   unipile_id?: string
 ) {
-  console.log(timezone)
+  console.log(timezone);
   const unipileId = unipile_id || (await getUnipileId());
   if (unipileId) {
     const supabase = await createClient();
-    const postTime = getRandomPostTime(timezone)
-    const {error} = await supabase.from('comment_proposal').update({post_time:postTime}).eq('id',id)
-    if(error) return {success:false}
-    return {success:true}
+    const postTime = getRandomPostTime(timezone);
+    const { error } = await supabase
+      .from("comment_proposal")
+      .update({ post_time: postTime })
+      .eq("id", id);
+    if (error) return { success: false };
+    return { success: true };
   }
-  return {success:false}
+  return { success: false };
 }
 
-export const isTrialEnded = async (unipile_id: string|null) => {
+export const isTrialEnded = async (unipile_id: string | null) => {
   if (!unipile_id) return true;
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -176,11 +211,11 @@ export const isTrialEnded = async (unipile_id: string|null) => {
     .select("end_trial")
     .eq("unipile_id", unipile_id)
     .single();
-    console.log(data)
+  console.log(data);
   if (error) {
     console.log(error);
     return false;
   }
   if (!data.end_trial) return false;
   return new Date(data.end_trial) < new Date();
-}
+};

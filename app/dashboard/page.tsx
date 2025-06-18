@@ -4,10 +4,10 @@ import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import KeywordsChoose from "@/components/dashboard/kw-choose";
-import AccountsChoose from "@/components/dashboard/accounts-choose";
+import AccountsChoose from "@/components/dashboard/account-choose/accounts-choose";
 import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card";
 import { getUnipileId } from "@/utils/supabase/queries";
-import { getKeywords } from "@/utils/supabase/queries";
+import { getAccountsNkw } from "@/utils/supabase/queries";
 import { getLanguages } from "@/utils/supabase/queries";
 import { Navbar } from "@/components/navbar";
 import YourTone from "@/components/dashboard/tone/comment-examples";
@@ -22,10 +22,13 @@ const DashboardPage = async () => {
   console.log(hasSubscription);
   let isConnected = false;
   let keywords: string[] = [];
+  let accounts: string[] = [];
   let langues: string[] = [];
   if (hasSubscription) {
     isConnected = await isUnipileAccountConnected(unipile_id ?? "");
-    keywords = await getKeywords();
+    const accountsNkw = await getAccountsNkw();
+    keywords = accountsNkw.keywords?.keywords ?? [];
+    accounts = accountsNkw.accounts?.accounts ?? [];
     langues = await getLanguages();
   }
   return (
@@ -78,12 +81,14 @@ const DashboardPage = async () => {
                   <div className="w-full flex flex-col space-y-8">
                     <div className="flex flex-row w-full space-x-4">
                       <KeywordsChoose unipileId={unipile_id} kw={keywords} />{" "}
-                      <AccountsChoose />
+                      
                       <LanguageChoose
                         unipileId={unipile_id}
                         langues={langues}
                       />
                     </div>
+                    <AccountsChoose unipileId={unipile_id} accounts={accounts} />
+                    <Separator />
                     <YourTone />
                   </div>
 

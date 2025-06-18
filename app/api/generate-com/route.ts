@@ -5,9 +5,10 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
 import { OpenAI } from "openai";
-import { ExampleComment, KeywordsTable } from "@/types";
+import { QdrantCom } from "@/types";
 import { checkAccountConnected, languagesSupported } from "@/utils/helpers";
-
+import { getAccountsNkw } from "@/utils/supabase/queries";
+import { getSystemPrompt } from "./libs";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -27,55 +28,40 @@ async function generateComment(
   console.log("fullLanguagePost", fullLanguagePost);
   const exampleCom = (await retrieveQdrantCom({
     queryVector: await vectorize(post),
-    limit: 7,
+    limit: 5,
     unipile_id,
-  })) as string[];
+  })) as unknown as QdrantCom[];
 
-  const exampleMessages: ExampleComment[] = exampleCom.map((comment) => ({
-    role: "assistant" as const,
-    content: comment,
-  }));
-  console.log("exampleMessages");
-  console.log(exampleMessages);
+  // Create properly typed messages
+  const exampleMessages = exampleCom.map((comment) => [
+    {
+      role: "user" as const,
+      content: comment.post,
+    },
+    {
+      role: "assistant" as const,
+      content: comment.comments,
+    },
+  ]).flat() as { role: 'user' | 'assistant'; content: string }[];
+
+  const userMessage = {
+    role: "user" as const,
+    content: `### My LinkedIn account description:
+${profileDescription}
+
+## Post to Comment On (IN ${fullLanguagePost.toUpperCase()}):
+"${post}"`
+  } as { role: 'user'; content: string };
+
+  console.log([getSystemPrompt(fullLanguagePost), ...exampleMessages, userMessage]);
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
-    messages: [
-      {
-        role: "system",
-        content: `**Instruction:**  
-Write a LinkedIn comment that sounds natural, warm, and in line with the tone of the original post. Use the user's profile description and example comments as inspiration.
-
-**Important:**  
-Match the tone of the example comments exactly. Your output must feel like it was written by the same person who wrote the examples — same energy, same vocabulary, same rhythm.
-
-### Guidelines
-
-1. Carefully read the LinkedIn post to understand its key themes (e.g., collaboration, innovation, milestones, mindset).
-2. Pay close attention to the tone, style, and voice of the example comments. You must replicate that tone to blend in naturally.
-3. Write a short, conversational LinkedIn comment in ${fullLanguagePost}.
-4. Speak in the first person, as if you're genuinely reacting or contributing.
-5. Avoid any robotic or generic phrasing.
-
-### Output Format
-
-- A single LinkedIn comment (1–2 sentences max).
-- Warm, personal, friendly — never formal or overdone.
-- Use normal punctuation (periods, commas), no double hyphens or ellipses.
-- Avoid cliché phrases, emojis, or patterns that feel AI-generated.
-- Your goal is to sound exactly like a real human who’s part of the conversation.`,
-      },
-      ...exampleMessages, // keep these only if you control them per language
-      {
-        role: "user",
-        content: `### My LinkedIn account description:
-${profileDescription}
-  
-## Post to Comment On (IN ${fullLanguagePost.toUpperCase()}):
-"${post}"`,
-      },
-    ],
+    messages: [getSystemPrompt(fullLanguagePost), ...exampleMessages, userMessage] as {
+      role: 'user' | 'assistant' | 'system';
+      content: string;
+    }[],
     temperature: 1,
-    max_completion_tokens: 2048,
+    max_tokens: 2048,
     top_p: 1,
     frequency_penalty: 0,
     presence_penalty: 0,
@@ -123,23 +109,19 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const account_id = body.account_id;
-  const { data: keywords, error: keywordsError } = await supabase
-    .from("keywords")
-    .select(
-      "keywords, unipile_id(user_id,com_per_day_max, profile_description)"
-    )
-    .eq("unipile_id", account_id)
-    .single();
-
-  console.log(keywords);
+  // const { data: keywords, error: keywordsError } = await supabase
+  //   .from("keywords")
+  //   .select(
+  //     "keywords, unipile_id(user_id,com_per_day_max, profile_description)"
+  //   )
+  //   .eq("unipile_id", account_id)
+  //   .single();
+  const data = await getAccountsNkw(account_id);
+  console.log(data);
   // return
-  if (keywordsError) {
-    console.log("kw err");
-    console.log(keywordsError);
-  }
-  if (!keywords) return;
+  if (!(data.keywords?.keywords) && !(data.accounts?.accounts)) return NextResponse.json({ error: "No keywords or accounts" }, { status: 401 });
 
-  const isConnected = await checkAccountConnected((keywords as unknown as KeywordsTable).unipile_id.user_id,account_id);
+  const isConnected = await checkAccountConnected(data.user_id,account_id);
   if (!isConnected) return NextResponse.json(
     { error: "Account not connected" },
     { status: 401 }
@@ -149,7 +131,7 @@ export async function POST(req: Request) {
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
 
-  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=${keywords.keywords
+  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=${data.keywords?.keywords
     .join(" OR ")
     .split(" ")
     .join("%20")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
@@ -185,14 +167,7 @@ export async function POST(req: Request) {
   // });
   // console.log(posts);
   // return Next/Response.json({ok:true});
-  console.log(
-    "\n--------------------------------------\n\n" +
-      (
-        keywords.unipile_id as unknown as {
-          com_per_day_max: number;
-        }
-      ).com_per_day_max
-  );
+  console.log("\n--------------------------------------\n\n" +data.com_per_day_max);
   let n_commments = 0;
   for (let i = 0; i < 2; i++) {
     let selectedLang;
@@ -205,36 +180,16 @@ export async function POST(req: Request) {
     } else {
       selectedLang = ["en"];
     }
-    if (
-      n_commments >=
-      Number(
-        (
-          keywords.unipile_id as unknown as {
-            com_per_day_max: number;
-          }
-        ).com_per_day_max
-      )
-    )
-      break;
+    if (n_commments >=data.com_per_day_max) break;
     for (const post of posts.items) {
       const languagePost = await detectlanguage.detect(post.text);
       if (
         ((Number(post.date.slice(0, -1)) <= 12 &&
           post.date.slice(-1) === "h") ||
           post.date.slice(-1) === "m") &&
-        n_commments <
-          Number(
-            (
-              keywords.unipile_id as unknown as {
-                com_per_day_max: number;
-              }
-            ).com_per_day_max
-          ) &&
+        n_commments < data.com_per_day_max &&
         post.text.length > 300 &&
         post.permissions.can_post_comments &&
-        //  && keywords.keywords.some((el: string) =>
-        //   post.text.split(/[\s.,;!?]+/).includes(el)
-        // )
         selectedLang.includes(languagePost[0].language)
       ) {
         //faiblesse dans l'approche
@@ -244,8 +199,7 @@ export async function POST(req: Request) {
           account_id,
           post.author.name,
           post.social_id,
-          (keywords.unipile_id as unknown as { profile_description: string })
-            .profile_description,
+          data.profile_description,
           languagePost[0].language
         );
         if (!response.error) n_commments++;

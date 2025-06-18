@@ -30,8 +30,9 @@ export async function getPostFromId(postId: string, unipileId: string) {
   return post;
 }
 
-export async function getProviderId(unipile_id: string) {
+export async function getProviderId(unipile_id: string,public_id?:string) {
   console.log("unipile_id from function", unipile_id);
+  console.log(public_id ?? "me")
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
@@ -42,7 +43,7 @@ export async function getProviderId(unipile_id: string) {
     redirect: "follow",
   };
   const provider_id = await fetch(
-    "https://api13.unipile.com:14361/api/v1/users/me?account_id=" + unipile_id,
+    `https://api13.unipile.com:14361/api/v1/users/${public_id ?? "me"}?account_id=${unipile_id}`,
     requestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -160,7 +161,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
       const comments = await getUserComments(result.account_id, provider_id);
       console.log("comments", comments);
       for (const comment of comments.items) {
-        if (comment.text.length > 10 && comment.author === profileName) {
+        if (comment.text.length > 15 && comment.author === profileName) {
           const post = await getPostFromId(comment.post_urn, result.account_id);
           await qdrantSavePost(post.text, comment.text, result.account_id);
           await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}

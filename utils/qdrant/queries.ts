@@ -3,6 +3,7 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { getUnipileId } from "../supabase/queries";
 import { getErrorRedirect } from "../helpers";
 import { redirect } from "next/navigation";
+import { QdrantCom } from "@/types";
 const client = new QdrantClient({
   url: process.env.QDRANT_CLUSTER_LINK!,
   apiKey: process.env.QDRANT_CLUSTER_API_KEY!,
@@ -30,9 +31,13 @@ export async function retrieveQdrantCom(vectorSearch?: {
         ],
       },
     });
-    const commentList: string[] = results.map(
-      (result) => result.payload?.comment
-    ) as string[];
+    const commentList: QdrantCom[] = results.map(
+      (result) =>
+        ({
+          comments: result.payload?.comment || [],
+          post: result.payload?.post || [],
+        } as QdrantCom)
+    );
     return commentList;
   } else {
     results = await client.scroll("comment_history", {
@@ -99,7 +104,6 @@ export async function qdrantSavePost(
     },
   });
 
-
   if (existing.points.length === 0) {
     const res = await client.upsert("comment_history", {
       points: [
@@ -114,7 +118,7 @@ export async function qdrantSavePost(
     if (!(res.status === "completed" || res.status === "acknowledged")) {
       redirect(getErrorRedirect("/dashboard", "Failed to save post"));
     }
-  }else console.log("post already exists")
+  } else console.log("post already exists");
   return { success: true };
 }
 
