@@ -17,7 +17,7 @@ const supabase = createClient(
 );
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function generateComment(
+export async function generateComment(
   post: string,
   unipile_id: string,
   profileDescription: string,
@@ -55,7 +55,7 @@ async function generateComment(
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
     messages: [getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage] as ChatCompletionMessageParam[],
-    temperature: 0.6,
+    temperature: 0.68,
     max_tokens: 2048,
     top_p: 1,
     frequency_penalty: 0,
@@ -128,20 +128,22 @@ export async function POST(req: Request) {
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
 
-  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=(${data.keywords?.keywords
-  .map((keyword) => `%22${keyword}%22`)
-  .join(" OR ")
-  .split(" ")
-  .join("%20")})${languagesSupported
-    .map((lang) => {
-      if (data.langues?.includes(lang.value)) {
-        return lang.smallWords
-          .map((word) => ` AND %22${word}%22`.replace(" ", "%20"))
-          .join("");
-      }
-      return "";
-    })
-    .join("")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
+  const keywords = data.keywords?.keywords || [];
+  const selectedLanguages = data.langues || [];
+  
+  const keywordQuery = keywords.length === 1
+    ? `%22${encodeURIComponent(keywords[0])}%22`
+    : `(${keywords.map(k => `%22${encodeURIComponent(k)}%22`).join("%20OR%20")})`;
+  
+  const languageQuery = languagesSupported
+    .filter(lang => selectedLanguages.includes(lang.value))
+    .flatMap(lang =>
+      lang.smallWords.map(word => `%20AND%20%22${encodeURIComponent(word)}%22`)
+    )
+    .join("");
+  
+  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType=photos&datePosted=past-24h&keywords=${keywordQuery}${languageQuery}&origin=FACETED_SEARCH&sortBy=relevance`;
+  
 
   console.log(linkedInUrl);
   // return
@@ -176,7 +178,7 @@ export async function POST(req: Request) {
   // });
   // console.log(posts);
   // return Next/Response.json({ok:true});
-  console.log("\n--------------------------------------\n\n" +data.com_per_day_max);
+  console.log("\n--------------------------------------\n\n" +data.com_per_day_max, posts.items.length);
   let n_commments = 0;
   for (let i = 0; i < 2; i++) {
     let selectedLang;
