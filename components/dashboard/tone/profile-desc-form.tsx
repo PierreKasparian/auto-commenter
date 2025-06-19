@@ -19,15 +19,17 @@ const ProfileDescriptionForm = ({profileDesc}: {profileDesc: string}) => {
     }
     return (
     <form onSubmit={handleSubmit} className="space-y-2 px-6 mt-4">
-        <Label htmlFor="profile-description">Profile description</Label>
+        <Label htmlFor="profile-description" className="text-md">Profile description</Label>
+        <p className="text-gray-500">
+        Copy/paste your about section here. <br />
+        The AI will use this profile description to generate more effective comment suggestions. Add information to improve your comments suggestions. This won&apos;t appear on your Linkedin profile.
+        </p>
         <Textarea
           id="profile-description"
           placeholder="Enter your profile description"
           value={profileDescription}
           onChange={(e) => setProfileDescription(e.target.value)}
         />
-        <p className="text-xs text-gray-500">
-        The AI will use this profile description to generate more effective comment suggestions. Add information to improve your comments suggestions. This won&apos;t appear on your Linkedin profile.</p>
         <Button
           type="submit"
           className="bg-teal-600 hover:bg-teal-700">

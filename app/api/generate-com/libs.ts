@@ -1,7 +1,7 @@
 export const getSystemPrompt = (fullLanguagePost: string, profileDescription: string) => {
     return {
     role: "system",
-    content: `**Instruction:**  
+    content: [{type:"text",text:`**Instruction:**  
 Write a LinkedIn comment that sounds natural, warm, and in line with the tone of the original post. Use the user's profile description and example comments as inspiration.
 
 **Important:**  
@@ -14,6 +14,7 @@ Match the tone of the example comments exactly. Your output must feel like it wa
 3. Write a short, conversational LinkedIn comment in ${fullLanguagePost}.
 4. Speak in the first person, as if you're genuinely reacting or contributing.
 5. Avoid any robotic or generic phrasing.
+6. Favor comments that add real value to the conversation — those are more likely to be liked and surface to the top. It’s good to approve or agree with the post, then build on it with a complementary insight, question, or relevant addition.
 
 ### Output Format
 
@@ -24,6 +25,6 @@ Match the tone of the example comments exactly. Your output must feel like it wa
 - Your goal is to sound exactly like a real human who’s part of the conversation.
 
 ### User LinkedIn account description:
-${profileDescription}`,
+${profileDescription}`}],
   }
 }

@@ -1,5 +1,6 @@
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
+import type { ChatCompletionMessageParam } from 'openai/resources/index.mjs';
 import DetectLanguage from "detectlanguage";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
@@ -36,26 +37,24 @@ async function generateComment(
   const exampleMessages = exampleCom.map((comment) => [
     {
       role: "user" as const,
-      content: comment.post,
+      content: [{type:"text",text:comment.post}],
     },
     {
       role: "assistant" as const,
-      content: comment.comments,
+      content: [{type:"text",text:comment.comments}],
     },
-  ]).flat() as { role: 'user' | 'assistant'; content: string }[];
+  ]).flat() as unknown as ChatCompletionMessageParam[];
 
   const userMessage = {
     role: "user" as const,
-    content: post
-  } as { role: 'user'; content: string };
+    content: [{"type":"text","text":post}] 
+  } as unknown as ChatCompletionMessageParam;
 
-  // console.log([getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage]);
+  console.log(JSON.stringify([getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage]));
+  // return
   const response = await openai.chat.completions.create({
     model: "gpt-4.1",
-    messages: [getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage] as {
-      role: 'user' | 'assistant' | 'system';
-      content: string;
-    }[],
+    messages: [getSystemPrompt(fullLanguagePost, profileDescription), ...exampleMessages, userMessage] as ChatCompletionMessageParam[],
     temperature: 0.6,
     max_tokens: 2048,
     top_p: 1,
@@ -63,7 +62,7 @@ async function generateComment(
     presence_penalty: 0,
     stream: false,
   });
-
+  
   return response.choices[0]?.message.content?.replace("—", ", ");
 }
 
@@ -117,6 +116,8 @@ export async function POST(req: Request) {
   // return
   if (!(data.keywords?.keywords) && !(data.accounts?.accounts)) return NextResponse.json({ error: "No keywords or accounts" }, { status: 401 });
 
+
+
   const isConnected = await checkAccountConnected(data.user_id,account_id);
   if (!isConnected) return NextResponse.json(
     { error: "Account not connected" },
@@ -127,10 +128,21 @@ export async function POST(req: Request) {
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
 
-  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=${data.keywords?.keywords
-    .join(" OR ")
-    .split(" ")
-    .join("%20")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
+  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=(${data.keywords?.keywords
+  .map((keyword) => `%22${keyword}%22`)
+  .join(" OR ")
+  .split(" ")
+  .join("%20")})${languagesSupported
+    .map((lang) => {
+      if (data.langues?.includes(lang.value)) {
+        return lang.smallWords
+          .map((word) => ` AND %22${word}%22`.replace(" ", "%20"))
+          .join("");
+      }
+      return "";
+    })
+    .join("")}&origin=FACETED_SEARCH&sid=(p5&sortBy="relevance"`;
+
   console.log(linkedInUrl);
   // return
   const raw = JSON.stringify({
@@ -169,11 +181,7 @@ export async function POST(req: Request) {
   for (let i = 0; i < 2; i++) {
     let selectedLang;
     if (i == 0) {
-      const { data } = await supabase
-        .from("unipile_id")
-        .select("langues")
-        .eq("unipile_id", account_id);
-      selectedLang = data?.[0]?.langues;
+      selectedLang = data.langues ?? ["en"];
     } else {
       selectedLang = ["en"];
     }

@@ -58,7 +58,7 @@ export default function KeywordsChoose({unipileId, kw}: {unipileId: string, kw: 
             onKeyDown={handleKeyDown}
             className="flex-1"
           />
-          <Button size="sm" onClick={addKeyword} disabled={!newKeyword.trim()}>
+          <Button size="sm" onClick={addKeyword} disabled={!newKeyword.trim() || keywords.length > 3}>
             <Plus className="h-4 w-4 mr-1" /> Add
           </Button>
         </div>

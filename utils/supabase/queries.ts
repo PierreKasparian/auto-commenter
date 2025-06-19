@@ -83,11 +83,12 @@ export const getAccountsNkw = async (
     profile_description: "",
     accounts: { accounts: [] },
     keywords: { keywords: [] },
+    langues: [],
   };
   if (!unipileId) return res;
   const { data, error } = await supabase
     .from("unipile_id")
-    .select("user_id,com_per_day_max, profile_description,keywords(keywords),accounts(accounts)")
+    .select("user_id,com_per_day_max, profile_description,keywords(keywords),accounts(accounts),langues")
     .eq("unipile_id", unipileId)
     .single();
   if (error) {

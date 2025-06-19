@@ -156,6 +156,7 @@ export interface AccountNkw {
   profile_description: string;
   accounts?: {accounts:string[]},
   keywords?: {keywords:string[]};
+  langues?: string[];
 }
 
 export interface QdrantCom{

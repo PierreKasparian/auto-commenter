@@ -20,31 +20,31 @@ export function PricingSection({ isDashboard }: { isDashboard?: boolean }) {
       annualPrice: 90,
       features: [
         "10 automatic comments per day",
-        "5 custom keywords",
+        "4 custom keywords",
         "3 profiles to follow",
         // "Manual comment validation",
         "Email support",
       ],
       cta: isDashboard ? "Buy now" : "Start free trial",
-      highlighted: false,
-    },
-    {
-      name: "Professional",
-      description:
-        "For professionals who want to develop their LinkedIn network",
-      monthlyPrice: 20,
-      annualPrice: 180,
-      features: [
-        "25 automatic comments per day",
-        "20 custom keywords",
-        "15 profiles to follow",
-        // "Manual or automatic comment validation",
-        // "Performance analysis",
-        "Priority support",
-      ],
-      cta: isDashboard ? "Buy now" : "Start free trial",
       highlighted: true,
     },
+    // {
+    //   name: "Professional",
+    //   description:
+    //     "For professionals who want to develop their LinkedIn network",
+    //   monthlyPrice: 20,
+    //   annualPrice: 180,
+    //   features: [
+    //     "25 automatic comments per day",
+    //     "20 custom keywords",
+    //     "15 profiles to follow",
+    //     // "Manual or automatic comment validation",
+    //     // "Performance analysis",
+    //     "Priority support",
+    //   ],
+    //   cta: isDashboard ? "Buy now" : "Start free trial",
+    //   highlighted: true,
+    // },
     {
       name: "Enterprise",
       description: "Dedicated solution tailored to your needs",
@@ -108,7 +108,7 @@ export function PricingSection({ isDashboard }: { isDashboard?: boolean }) {
           </div>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={index}

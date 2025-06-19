@@ -4,7 +4,7 @@ import React from "react";
 import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import KeywordsChoose from "@/components/dashboard/kw-choose";
-import AccountsChoose from "@/components/dashboard/account-choose/accounts-choose";
+// import AccountsChoose from "@/components/dashboard/account-choose/accounts-choose";
 import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card";
 import { getUnipileId } from "@/utils/supabase/queries";
 import { getAccountsNkw } from "@/utils/supabase/queries";
@@ -22,13 +22,13 @@ const DashboardPage = async () => {
   console.log(hasSubscription);
   let isConnected = false;
   let keywords: string[] = [];
-  let accounts: string[] = [];
+  // let accounts: string[] = [];
   let langues: string[] = [];
   if (hasSubscription) {
     isConnected = await isUnipileAccountConnected(unipile_id ?? "");
     const accountsNkw = await getAccountsNkw();
     keywords = accountsNkw.keywords?.keywords ?? [];
-    accounts = accountsNkw.accounts?.accounts ?? [];
+    // accounts = accountsNkw.accounts?.accounts ?? [];
     langues = await getLanguages();
   }
   return (

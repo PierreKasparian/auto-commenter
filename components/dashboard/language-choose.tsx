@@ -35,22 +35,22 @@ export default function LanguageChoose({
   unipileId: string;
   langues: string[];
 }) {
-  const [languages, setLanguages] = useState<string[]>(langues);
+  const [languages, setLanguages] = useState<string>(langues[0]);
   const [newLanguage, setNewLanguage] = useState("");
 
   const addLanguage = async () => {
     if (newLanguage.trim() && !languages.includes(newLanguage.trim())) {
-      setLanguages([...languages, newLanguage.trim()]);
+      setLanguages(newLanguage.trim());
       setNewLanguage("");
     }
   };
 
   const removeLanguage = (languageToRemove: string) => {
-    setLanguages(languages.filter((language) => language !== languageToRemove));
+    setLanguages(languageToRemove);
   };
 
   const handleSave = async () => {
-    const result = await saveLanguages(languages, unipileId)
+    const result = await saveLanguages([languages], unipileId)
     if (result.success) {
       toastStatusPop("Success ! 🎉", "Your languages have been successfully saved")
     }else{
@@ -97,7 +97,7 @@ export default function LanguageChoose({
         <div className="min-h-20 p-3 border rounded-md bg-muted/40">
           {languages.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {languages.map((language) => (
+              {[languages].map((language) => (
                 <Badge key={language} variant="secondary" className="px-2 py-1">
                   {language}
                   <button
@@ -117,7 +117,7 @@ export default function LanguageChoose({
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline" onClick={() => setLanguages([])}>Reset</Button>
+        <Button variant="outline" onClick={() => setLanguages("en")}>Reset</Button>
         <Button
           type="button"
           onClick={() => handleSave()}
