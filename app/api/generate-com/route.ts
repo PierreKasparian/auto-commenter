@@ -17,7 +17,7 @@ const supabase = createClient(
 );
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-export async function generateComment(
+async function generateComment(
   post: string,
   unipile_id: string,
   profileDescription: string,
