@@ -35,10 +35,10 @@ async function generateComment(
 
   // Create properly typed messages
   const exampleMessages = exampleCom.map((comment) => [
-    {
-      role: "user" as const,
-      content: [{type:"text",text:comment.post}],
-    },
+    // {
+    //   role: "user" as const,
+    //   content: [{type:"text",text:comment.post}],
+    // },
     {
       role: "assistant" as const,
       content: [{type:"text",text:comment.comments}],
@@ -132,17 +132,17 @@ export async function POST(req: Request) {
   const selectedLanguages = data.langues || [];
   
   const keywordQuery = keywords.length === 1
-    ? `%22${encodeURIComponent(keywords[0])}%22`
-    : `(${keywords.map(k => `%22${encodeURIComponent(k)}%22`).join("%20OR%20")})`;
+    ? `"${encodeURIComponent(keywords[0])}"`
+    : `(${keywords.map(k => `"${encodeURIComponent(k)}"`).join("%20OR%20")})`;
   
   const languageQuery = languagesSupported
     .filter(lang => selectedLanguages.includes(lang.value))
     .flatMap(lang =>
-      lang.smallWords.map(word => `%20AND%20%22${encodeURIComponent(word)}%22`)
+      lang.smallWords.map(word => `%20AND%20"${encodeURIComponent(word)}"`)
     )
     .join("");
   
-  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType=photos&datePosted=past-24h&keywords=${keywordQuery}${languageQuery}&origin=FACETED_SEARCH&sortBy=relevance`;
+  const linkedInUrl = `https://www.linkedin.com/search/results/content/?contentType="photos"&datePosted="past-24h"&keywords=${keywordQuery}${languageQuery}&origin=FACETED_SEARCH&sortBy="relevance"`;
   
 
   console.log(linkedInUrl);
@@ -169,7 +169,9 @@ export async function POST(req: Request) {
       return response.json();
     })
     .catch((error) => console.error(error));
-
+    console.log(JSON.stringify(posts.items[0]))
+    console.log(JSON.stringify(posts.items[1]))
+    // return
   //   //comment long
   // posts.items.sort((a: LinkedInPost, b: LinkedInPost) => {
   //   const textLengthA = a.text ? a.text.length : 0;
