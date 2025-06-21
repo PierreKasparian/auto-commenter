@@ -61,7 +61,8 @@ const page = async () => {
 //   // console.log(error)
 //   // console.log(data.user?.email)
 //   console.log(comment)
-  return <div className=""></div>;
+  return <div></div>
+  ;
 };
 
 export default page

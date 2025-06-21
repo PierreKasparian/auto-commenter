@@ -9,16 +9,16 @@ import { createClient } from "@/utils/supabase/server";
 
 export default async function Home() {
   if(process.env.NEXT_ENV === "development"){
-    // await fetch("http://localhost:3000/api/generate-com", {
-    //   method: "POST",
-    //   headers: {
-    //     Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
-    //   },
-    //   body: JSON.stringify({
-    //     account_id: "Sv6WoXHCQT2yu9P1V0agoQ",
+    await fetch("http://localhost:3000/api/generate-com", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.TRIG_TASK_KEY}`,
+      },
+      body: JSON.stringify({
+        account_id: "Sv6WoXHCQT2yu9P1V0agoQ",
         
-    //   }),
-    // });
+      }),
+    });
   
     // await fetch("https://auto-commenter.vercel.app/api/cron", {
     //   method: "GET",

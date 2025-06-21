@@ -1,62 +1,74 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { ExternalLink, Check, X, Clock } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
-import type { CommentProposal } from "@/types"
-import { Textarea } from "@/components/ui/textarea"
-import { delCommentProposal } from "@/utils/supabase/queries"
-import { acceptComment } from "@/utils/supabase/queries"
-import { toastStatusPop, toastErrorPop } from "@/utils/helpers"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { ExternalLink, Check, X, Clock } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
+import type { CommentProposal } from "@/types";
+import { Textarea } from "@/components/ui/textarea";
+import { delCommentProposal } from "@/utils/supabase/queries";
+import { acceptComment } from "@/utils/supabase/queries";
+import { toastStatusPop, toastErrorPop } from "@/utils/helpers";
+import Image from "next/image";
 
 interface CommentProposalCardProps {
-  proposal: CommentProposal
+  proposal: CommentProposal;
 }
 
 export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [actionType, setActionType] = useState<"accept" | "reject" | null>(null)
-  const [commentIA, setCommentIA] = useState(proposal.comment_IA)
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [actionType, setActionType] = useState<"accept" | "reject" | null>(
+    null
+  );
+  const [commentIA, setCommentIA] = useState(proposal.comment_IA);
 
   const handleAccept = async () => {
     try {
-      setIsProcessing(true)
-      setActionType("accept")
-      console.log(commentIA)
-      const result = await acceptComment(proposal.id,proposal.unipile_id.user_timezone.timezone)
+      setIsProcessing(true);
+      setActionType("accept");
+      console.log(commentIA);
+      const result = await acceptComment(
+        proposal.id,
+        proposal.unipile_id.user_timezone.timezone
+      );
       if (result.success) {
-        toastStatusPop("Success ! 🎉", "Your comment has been successfully accepted")
-      }else{
-        toastErrorPop("Error", "Failed to accept comment")
+        toastStatusPop(
+          "Success ! 🎉",
+          "Your comment has been successfully accepted"
+        );
+      } else {
+        toastErrorPop("Error", "Failed to accept comment");
       }
     } catch (error) {
-      console.error("Failed to accept comment:", error)
-      toastErrorPop("Error", "Failed to accept comment")
+      console.error("Failed to accept comment:", error);
+      toastErrorPop("Error", "Failed to accept comment");
     } finally {
-      setIsProcessing(false)
-      setActionType(null)
+      setIsProcessing(false);
+      setActionType(null);
     }
-  }
+  };
 
   const handleReject = async () => {
     try {
-      setIsProcessing(true)
-      setActionType("reject")
-      const result = await delCommentProposal(proposal.id)
+      setIsProcessing(true);
+      setActionType("reject");
+      const result = await delCommentProposal(proposal.id);
       if (result.success) {
-        toastStatusPop("Success ! 🎉", "Your comment has been successfully rejected")
-      }else{
-        toastErrorPop("Error", "Failed to reject comment")
+        toastStatusPop(
+          "Success ! 🎉",
+          "Your comment has been successfully rejected"
+        );
+      } else {
+        toastErrorPop("Error", "Failed to reject comment");
       }
     } catch (error) {
-      console.error("Failed to reject comment:", error)
-      toastErrorPop("Error", "Failed to reject comment")
+      console.error("Failed to reject comment:", error);
+      toastErrorPop("Error", "Failed to reject comment");
     } finally {
-      setIsProcessing(false)
-      setActionType(null)
+      setIsProcessing(false);
+      setActionType(null);
     }
-  }
+  };
 
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
@@ -66,23 +78,25 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
           <div className="flex items-center space-x-3">
             <Clock className="h-4 w-4 text-gray-400" />
             <span className="text-sm text-gray-600">
-              Proposed {formatDistanceToNow(proposal.created_at, { addSuffix: true })}
+              Proposed{" "}
+              {formatDistanceToNow(proposal.created_at, { addSuffix: true })}
             </span>
           </div>
-
         </div>
       </div>
 
       {/* Original Post */}
       <div className="p-6 border-b">
         <div className="flex items-start space-x-4">
-        <div className="h-8 w-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-sm">
-                          {proposal.author_name.charAt(0)}
-                        </div>
+          <div className="h-8 w-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-bold text-sm">
+            {proposal.author_name.charAt(0)}
+          </div>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-2">
               <div>
-                <h3 className="font-semibold text-gray-900">{proposal.author_name}</h3>
+                <h3 className="font-semibold text-gray-900">
+                  {proposal.author_name}
+                </h3>
               </div>
               <div className="flex items-center space-x-2">
                 <span className="text-xs text-gray-500">
@@ -99,7 +113,37 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
                 </a>
               </div>
             </div>
-            <pre className="text-gray-700 leading-relaxed whitespace-pre-line break-words" style={{ fontFamily: 'inherit' }}>{proposal.post_text}</pre>
+            <div className="flex flex-row space-x-4">
+              {/* Colonne texte (50%) */}
+              <div className={proposal.attachments && proposal.attachments.length>0 ? "w-1/2" : "w-full"}>
+                <pre
+                  className="text-gray-700 leading-relaxed whitespace-pre-line break-words"
+                  style={{ fontFamily: "inherit" }}
+                >
+                  {proposal.post_text}
+                </pre>
+              </div>
+
+              {/* Colonne image (50%) */}
+              {proposal.attachments && proposal.attachments.length > 0 && (
+                <div className="w-1/2 flex flex-col space-y-2">
+                  {proposal.attachments.map((attachment) => (
+                    <div key={attachment} className="w-full">
+                      <Image
+                        src={attachment}
+                        alt={`Attachment ${attachment}`}
+                        className="rounded"
+                        width={0}
+                        height={0}
+                        sizes="50vw"
+                        style={{ width: "100%", height: "auto" }}
+                        priority
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -124,7 +168,12 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
           AI-Generated Comment
         </h4>
         <div className="bg-white rounded-lg p-4 border border-teal-200">
-          <Textarea value={commentIA} className="text-gray-700 leading-relaxed whitespace-pre-line break-words border-none focus:ring-0" style={{ fontFamily: 'inherit' }} onChange={(e) => setCommentIA(e.target.value)} />
+          <Textarea
+            value={commentIA}
+            className="text-gray-700 leading-relaxed whitespace-pre-line break-words border-none focus:ring-0"
+            style={{ fontFamily: "inherit" }}
+            onChange={(e) => setCommentIA(e.target.value)}
+          />
         </div>
       </div>
 
@@ -144,7 +193,11 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
             )}
             Reject
           </Button>
-          <Button onClick={handleAccept} disabled={isProcessing} className="flex-1 bg-teal-600 hover:bg-teal-700">
+          <Button
+            onClick={handleAccept}
+            disabled={isProcessing}
+            className="flex-1 bg-teal-600 hover:bg-teal-700"
+          >
             {isProcessing && actionType === "accept" ? (
               <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
             ) : (
@@ -155,5 +208,5 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

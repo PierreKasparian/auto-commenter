@@ -137,6 +137,7 @@ export interface CommentProposal {
       timezone: string;
     };
   };
+  attachments:string[]
 }
 [];
 
@@ -162,4 +163,16 @@ export interface AccountNkw {
 export interface QdrantCom{
   comments:string,
   post:string
+}
+
+export type Attachment = {
+  id: string,
+  sticker: boolean,
+  size: {
+    height: number,
+    width: number
+  },
+  unavailable: boolean,
+  type: string,
+  url: string
 }

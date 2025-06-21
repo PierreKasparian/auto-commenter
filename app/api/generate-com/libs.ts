@@ -1,3 +1,6 @@
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Attachment } from "@/types";
+
 export const getSystemPrompt = (
   fullLanguagePost: string,
   profileDescription: string
@@ -44,3 +47,11 @@ ${profileDescription}`,
     ],
   };
 };
+
+export async function getAttachmentsURL(attachments: Attachment[]){
+  const urls:string[] = [];
+  for (const attachment of attachments) {
+    urls.push(attachment.url)
+  }
+  return urls;
+}

@@ -6,10 +6,10 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { retrieveQdrantCom, vectorize } from "@/utils/qdrant/queries";
 import { OpenAI } from "openai";
-import { QdrantCom } from "@/types";
+import { Attachment, QdrantCom } from "@/types";
 import { checkAccountConnected, languagesSupported } from "@/utils/helpers";
 import { getAccountsNkw } from "@/utils/supabase/queries";
-import { getSystemPrompt } from "./libs";
+import { getAttachmentsURL, getSystemPrompt } from "./libs";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -73,7 +73,8 @@ async function createComment(
   author_name: string,
   post_id: string,
   profileDescription: string,
-  languagePost: string
+  languagePost: string,
+  attachments: Attachment[]
 ) {
   const comment = await generateComment(
     post,
@@ -81,6 +82,7 @@ async function createComment(
     profileDescription,
     languagePost
   );
+  const attachUrls = await getAttachmentsURL(attachments);
   const { error } = await supabase.from("comment_proposal").insert({
     unipile_id: account_id,
     post_text: post,
@@ -88,6 +90,7 @@ async function createComment(
     comment_IA: comment,
     author_name: author_name,
     post_id: post_id,
+    attachments: attachUrls,
   });
   if (error) return { error: error };
   return { error: null };
@@ -209,7 +212,8 @@ export async function POST(req: Request) {
           post.author.name,
           post.social_id,
           data.profile_description,
-          languagePost[0].language
+          languagePost[0].language,
+          post.attachments
         );
         if (!response.error) n_commments++;
         // console.log(response);
