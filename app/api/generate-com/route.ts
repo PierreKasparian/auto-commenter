@@ -244,7 +244,7 @@ console.log(data.accounts?.accounts)
     posts.items?.length
   );
 // return
-  // await browsePosts(account_id, data, posts.items,true);
+  await browsePosts(account_id, data, posts.items,true);
   await browsePosts(account_id, data, accountsPosts,false,-accountsPosts.length );
 
   return NextResponse.json({ ok: true });
