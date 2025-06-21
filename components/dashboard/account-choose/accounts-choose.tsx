@@ -17,7 +17,7 @@ export default function AccountsChoose({unipileId, accounts}: {unipileId: string
   const [newAccount, setNewAccount] = useState("")
 
   const addAccount = async () => {
-    if (newAccount.trim() && !accountsList.includes(newAccount.trim()) && accountsList.length < 4) {
+    if (newAccount.trim() && !accountsList.includes(newAccount.trim()) && accountsList.length < 15) {
       setAccountsList([...accountsList, newAccount.trim()])
       setNewAccount("")
     }
@@ -78,7 +78,7 @@ export default function AccountsChoose({unipileId, accounts}: {unipileId: string
             onKeyDown={handleKeyDown}
             className="flex-1"
           />
-          <Button size="sm" onClick={addAccount} disabled={!newAccount.trim() || accountsList.length >= 4}>
+          <Button size="sm" onClick={addAccount} disabled={!newAccount.trim() || accountsList.length >= 15}>
             <Plus className="h-4 w-4 mr-1" /> Add
           </Button>
         </div>

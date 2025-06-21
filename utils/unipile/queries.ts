@@ -150,7 +150,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
     const { error: unipileError } = await supabase.from("unipile_id").insert({
       unipile_id: result.account_id,
       user_id: data.user.id,
-      com_per_day_max: 5, //a changer
+      com_per_day_max: 2, //a changer
       profile_description: profileDescription ?? "",
       profile_name: profileName,
     });
