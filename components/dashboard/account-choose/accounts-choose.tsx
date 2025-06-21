@@ -17,7 +17,7 @@ export default function AccountsChoose({unipileId, accounts}: {unipileId: string
   const [newAccount, setNewAccount] = useState("")
 
   const addAccount = async () => {
-    if (newAccount.trim() && !accountsList.includes(newAccount.trim())) {
+    if (newAccount.trim() && !accountsList.includes(newAccount.trim()) && accountsList.length < 4) {
       setAccountsList([...accountsList, newAccount.trim()])
       setNewAccount("")
     }
@@ -55,12 +55,30 @@ export default function AccountsChoose({unipileId, accounts}: {unipileId: string
             placeholder="paste profile link: https://www.linkedin.com/in/account-id/"
             value={newAccount}
             onChange={(e) => {
-              console.log(e.target.value.split("/"))
-              setNewAccount(e.target.value.split("/")[e.target.value.split("/").length - 2])}}
+              const value = e.target.value.trim();
+              if (!value) {
+                setNewAccount("");
+                return;
+              }
+              try {
+                const parts = value.split("/");
+                if (parts.length < 2) {
+                  setNewAccount("");
+                  return;
+                }
+                const lastPart = parts[parts.length - 2];
+                if (lastPart && lastPart.length > 0) {
+                  setNewAccount(lastPart);
+                }
+              } catch (error) {
+                console.log(error)
+                setNewAccount("");
+              }
+            }}
             onKeyDown={handleKeyDown}
             className="flex-1"
           />
-          <Button size="sm" onClick={addAccount} disabled={!newAccount.trim()}>
+          <Button size="sm" onClick={addAccount} disabled={!newAccount.trim() || accountsList.length >= 4}>
             <Plus className="h-4 w-4 mr-1" /> Add
           </Button>
         </div>

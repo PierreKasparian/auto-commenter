@@ -34,10 +34,14 @@ export interface LinkedInPost {
   impressions_counter: number;
   reaction_counter: number;
   repost_counter: number;
-  permissions: object;
   text: string;
-  attachments: any[];
-  author: object;
+  permissions: {
+    can_post_comments: boolean;
+  }
+  attachments: Attachment[];
+  author: {
+    name: string;
+  };
   is_repost: boolean;
   id: string;
 }

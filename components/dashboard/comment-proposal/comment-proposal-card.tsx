@@ -115,7 +115,13 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
             </div>
             <div className="flex flex-row space-x-4">
               {/* Colonne texte (50%) */}
-              <div className={proposal.attachments && proposal.attachments.length>0 ? "w-1/2" : "w-full"}>
+              <div
+                className={
+                  proposal.attachments && proposal.attachments.length > 0
+                    ? "w-1/2"
+                    : "w-full"
+                }
+              >
                 <pre
                   className="text-gray-700 leading-relaxed whitespace-pre-line break-words"
                   style={{ fontFamily: "inherit" }}
@@ -126,17 +132,17 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
 
               {/* Colonne image (50%) */}
               {proposal.attachments && proposal.attachments.length > 0 && (
-                <div className="w-1/2 flex flex-col space-y-2">
+                <div className="w-1/2 flex flex-col space-y-2 max-h-[700px] overflow-y-scroll">
                   {proposal.attachments.map((attachment) => (
-                    <div key={attachment} className="w-full">
+                    <div key={attachment} className="w-full h-full">
                       <Image
                         src={attachment}
                         alt={`Attachment ${attachment}`}
-                        className="rounded"
+                        className="rounded object-contain h-full w-auto max-h-full"
                         width={0}
                         height={0}
                         sizes="50vw"
-                        style={{ width: "100%", height: "auto" }}
+                        style={{ maxHeight: "100%" }}
                         priority
                       />
                     </div>

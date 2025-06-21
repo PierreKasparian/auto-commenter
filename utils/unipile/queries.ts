@@ -4,6 +4,7 @@ import { getErrorRedirect, getStatusRedirect } from "../helpers";
 import { qdrantSavePost, qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { getUnipileId } from "../supabase/queries";
+import { LinkedInPost } from "@/types";
 
 export async function getPostFromId(postId: string, unipileId: string) {
   console.log("postID : ", postId, "unipileId", unipileId);
@@ -30,9 +31,9 @@ export async function getPostFromId(postId: string, unipileId: string) {
   return post;
 }
 
-export async function getProviderId(unipile_id: string,public_id?:string) {
+export async function getProviderId(unipile_id: string, public_id?: string) {
   console.log("unipile_id from function", unipile_id);
-  console.log(public_id ?? "me")
+  console.log(public_id ?? "me");
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
@@ -43,7 +44,9 @@ export async function getProviderId(unipile_id: string,public_id?:string) {
     redirect: "follow",
   };
   const provider_id = await fetch(
-    `https://api13.unipile.com:14361/api/v1/users/${public_id ?? "me"}?account_id=${unipile_id}`,
+    `https://api13.unipile.com:14361/api/v1/users/${
+      public_id ?? "me"
+    }?account_id=${unipile_id}`,
     requestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -169,7 +172,13 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
       }
     } catch (error) {
       console.log(error);
-      redirect(getErrorRedirect("/dashboard", "Error", "Error retrieving your comments"));
+      redirect(
+        getErrorRedirect(
+          "/dashboard",
+          "Error",
+          "Error retrieving your comments"
+        )
+      );
     }
     redirect(
       getStatusRedirect(
@@ -312,4 +321,46 @@ export async function fuckUnipile(
       )
     );
   }
+}
+
+export async function getUserPosts(public_ids: string[], unipile_id: string) {
+  let posts: LinkedInPost[] = [];
+
+  for (const public_id of public_ids) {
+    const myHeaders = new Headers();
+    myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
+    myHeaders.append("accept", "application/json");
+
+    const requestOptions = {
+      method: "GET",
+      headers: myHeaders,
+      redirect: "follow",
+    };
+
+    const response = await fetch(
+      "https://api13.unipile.com:14361/api/v1/users/" +
+        public_id +
+        "?account_id=" +
+        unipile_id,
+      requestOptions as RequestInit
+    )
+      .then((response) => response.json())
+      .catch((error) => console.log(error));
+    console.log(response);
+
+    const response2 = await fetch(
+      "https://api13.unipile.com:14361/api/v1/users/" +
+        response.provider_id +
+        "/posts?limit=1&account_id=" +
+        unipile_id,
+      requestOptions as RequestInit
+    )
+      .then((response) => response.json())
+      .catch((error) => console.log(error));
+    console.log(response2);
+
+    posts= [...posts, ...response2.items];
+  }
+
+  return posts;
 }

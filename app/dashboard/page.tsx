@@ -15,6 +15,7 @@ import LanguageChoose from "@/components/dashboard/language-choose";
 import { isUnipileAccountConnected } from "@/utils/helpers";
 import { isTrialEnded } from "@/utils/supabase/queries";
 import Link from "next/link";
+import AccountsChoose from "@/components/dashboard/account-choose/accounts-choose";
 const DashboardPage = async () => {
   const unipile_id = await getUnipileId();
   console.log(unipile_id);
@@ -22,13 +23,13 @@ const DashboardPage = async () => {
   console.log(hasSubscription);
   let isConnected = false;
   let keywords: string[] = [];
-  // let accounts: string[] = [];
+  let accounts: string[] = [];
   let langues: string[] = [];
   if (hasSubscription) {
     isConnected = await isUnipileAccountConnected(unipile_id ?? "");
     const accountsNkw = await getAccountsNkw();
     keywords = accountsNkw.keywords?.keywords ?? [];
-    // accounts = accountsNkw.accounts?.accounts ?? [];
+    accounts = accountsNkw.accounts?.accounts ?? [];
     langues = await getLanguages();
   }
   return (
@@ -87,7 +88,7 @@ const DashboardPage = async () => {
                         langues={langues}
                       />
                     </div>
-                    {/* <AccountsChoose unipileId={unipile_id} accounts={accounts} /> */}
+                    <AccountsChoose unipileId={unipile_id} accounts={accounts} />
                     <Separator />
                     <YourTone />
                   </div>
