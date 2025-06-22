@@ -17,11 +17,11 @@ function getRandomInt(min: number, max: number) {
 
 const generateRandomTime = (timezone: string) => {
   const time = new Date();
-  time.setHours(8);
+  time.setHours(16);
   const offsetMinutes = Math.max(getTimezoneOffsetInMinutes(timezone), -8 * 60);
 
   const timeofTimezone = time.getTime() + offsetMinutes * 60 * 1000;
-  const randomTime = getRandomInt(3, 120) * 5 * 60 * 1000;
+  const randomTime = getRandomInt(3, 24) * 5 * 60 * 1000;
   // const randomTime = 0
   return (timeofTimezone + randomTime).toString().slice(0, -5);
 };
@@ -91,7 +91,7 @@ export async function GET(req: Request) {
         new Date(user_timezone.end_trial) < new Date()
       ) {
         console.log("Trial ended for account", user_timezone.unipile_id);
-        return NextResponse.json({ error: "Trial ended" }, { status: 401 });
+        continue;
       }
 
       const formattedTime = generateRandomTime(

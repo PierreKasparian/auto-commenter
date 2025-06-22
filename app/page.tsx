@@ -20,15 +20,15 @@ export default async function Home() {
     //   }),
     // });
   
-    // await fetch("https://auto-commenter.vercel.app/api/cron", {
-    //   method: "GET",
-    //   headers: {
-    //     Authorization: `Bearer ${process.env.CRON_SECRET}`,
-    //   },
+    await fetch("https://auto-commenter.vercel.app/api/cron", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.CRON_SECRET}`,
+      },
       // body: JSON.stringify({
       //   account_id: "XSa0OZUISp-XvvZCmdCpog"
       // }),
-    // });
+    });
   }
   const supabase = await createClient();
   const { data: user } = await supabase.auth.getUser();
