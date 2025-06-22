@@ -17,7 +17,7 @@ function getRandomInt(min: number, max: number) {
 
 const generateRandomTime = (timezone: string) => {
   const time = new Date();
-  time.setHours(16);
+  time.setHours(6);
   const offsetMinutes = Math.max(getTimezoneOffsetInMinutes(timezone), -8 * 60);
 
   const timeofTimezone = time.getTime() + offsetMinutes * 60 * 1000;
