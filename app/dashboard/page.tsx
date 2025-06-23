@@ -8,7 +8,7 @@ import KeywordsChoose from "@/components/dashboard/kw-choose";
 import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card";
 import { getUnipileId } from "@/utils/supabase/queries";
 import { getAccountsNkw } from "@/utils/supabase/queries";
-import { getLanguages } from "@/utils/supabase/queries";
+//import { getLanguages } from "@/utils/supabase/queries";
 import { Navbar } from "@/components/navbar";
 import YourTone from "@/components/dashboard/tone/comment-examples";
 import LanguageChoose from "@/components/dashboard/language-choose";
@@ -30,7 +30,7 @@ const DashboardPage = async () => {
     const accountsNkw = await getAccountsNkw();
     keywords = accountsNkw.keywords?.keywords ?? [];
     accounts = accountsNkw.accounts?.accounts ?? [];
-    langues = await getLanguages();
+    langues = accountsNkw.langues ?? []//await getLanguages();
   }
   return (
     <>

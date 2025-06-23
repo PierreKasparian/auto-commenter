@@ -35,7 +35,7 @@ export default function LanguageChoose({
   unipileId: string;
   langues: string[];
 }) {
-  const [languages, setLanguages] = useState<string>(langues[0]);
+  const [languages, setLanguages] = useState<string>(langues[0] ?? "fr");
   const [newLanguage, setNewLanguage] = useState("");
 
   const addLanguage = async () => {
