@@ -163,7 +163,7 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
     try {
       const comments = await getUserComments(result.account_id, provider_id);
       console.log("comments", comments);
-      for (const comment of comments.items) {
+      for (const comment of comments.items.slice(0, 20)) {
         if (comment.text.length > 15 && comment.author === profileName) {
           const post = await getPostFromId(comment.post_urn, result.account_id);
           await qdrantSavePost(post.text, comment.text, result.account_id);
