@@ -43,11 +43,11 @@ export async function LinkedInAccountCard({
     // await linkedinConnect(accessToken, userAgent)
     url = await getUnipileConnectUrl(
       (process.env.NEXT_ENV === "development"
-        ? "http://localhost:3000/"
-        : "https://auto-commenter.vercel.app/") + successUrl,
+        ? "http://localhost:3000"
+        : "https://auto-commenter.vercel.app") + successUrl,
       (process.env.NEXT_ENV === "development"
-        ? "http://localhost:3000/"
-        : "https://auto-commenter.vercel.app/") + cancelUrl,
+        ? "http://localhost:3000"
+        : "https://auto-commenter.vercel.app") + cancelUrl,
       true,
       user?.user.id
     );
@@ -55,11 +55,11 @@ export async function LinkedInAccountCard({
     console.log("recconection");
     url = await getUnipileConnectUrl(
       (process.env.NEXT_ENV === "development"
-        ? "http://localhost:3000/"
-        : "https://auto-commenter.vercel.app/") + successUrl,
+        ? "http://localhost:3000"
+        : "https://auto-commenter.vercel.app") + successUrl,
       (process.env.NEXT_ENV === "development"
-        ? "http://localhost:3000/"
-        : "https://auto-commenter.vercel.app/") + cancelUrl,
+        ? "http://localhost:3000"
+        : "https://auto-commenter.vercel.app") + cancelUrl,
       false,
       unipileId!
     );
