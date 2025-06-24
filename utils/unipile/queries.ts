@@ -5,6 +5,7 @@ import { qdrantSavePost, qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { getUnipileId } from "../supabase/queries";
 import { LinkedInPost } from "@/types";
+import { NextResponse } from "next/server";
 
 export async function getPostFromId(postId: string, unipileId: string) {
   console.log("postID : ", postId, "unipileId", unipileId);
@@ -191,11 +192,59 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
 }
 
+export async function onSuccessConnect(user_id: string, unipile_id: string) {
+  const supabase = await createClient();
+  const provider_id = await getProviderId(unipile_id);
+  console.log("provider_id", provider_id);
+  const { profileDescription, profileName } = await getProfilDesc(
+    unipile_id,
+    provider_id
+  );
+  console.log(profileDescription);
+  const { error: unipileError } = await supabase.from("unipile_id").insert({
+    unipile_id: unipile_id,
+    user_id: user_id,
+    com_per_day_max: 2, //a changer
+    profile_description: profileDescription ?? "",
+    profile_name: profileName,
+  });
+  if (unipileError) {
+    console.log(unipileError);
+    return NextResponse.json({
+      status: "error",
+      message: "Error connecting your account",
+    });
+  }
+
+  await new Promise((resolve) => setTimeout(resolve, 2000));
+  try {
+    const comments = await getUserComments(unipile_id, provider_id);
+    console.log("comments", comments);
+    for (const comment of comments.items.slice(0, 20)) {
+      if (comment.text.length > 15 && comment.author === profileName) {
+        const post = await getPostFromId(comment.post_urn, unipile_id);
+        await qdrantSavePost(post.text, comment.text, unipile_id);
+        await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
+      }
+    }
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json({
+      status: "error",
+      message: "Error connecting your account",
+    });
+  }
+  return NextResponse.json({
+    status: "success",
+    message: "Your account has been successfully connected",
+  });
+}
+
 export const getUnipileConnectUrl = async (
   success_url: string,
   failure_url: string,
   isConnect: boolean,
-  unipile_id?: string,
+  id?: string
 ) => {
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
@@ -211,15 +260,18 @@ export const getUnipileConnectUrl = async (
           api_url: "https://api16.unipile.com:14661",
           success_redirect_url: success_url,
           failure_redirect_url: failure_url,
+          notify_url: "https://auto-commenter.vercel.app/api/unipile/",
+          name: id,
         }
       : {
           type: "reconnect",
           providers: "*",
           expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
           api_url: "https://api16.unipile.com:14661",
-          reconnect_account: unipile_id,
+          reconnect_account: id,
           success_redirect_url: success_url,
           failure_redirect_url: failure_url,
+          name: id,
         }
   );
 
