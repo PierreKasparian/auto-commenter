@@ -4,7 +4,7 @@ export async function POST(req: Request) {
   const body = await req.json();
   console.log(body);
   if (body.status == "CREATION_SUCCESS") {
-    await onSuccessConnect(body.user_id, body.unipile_id);
+    await onSuccessConnect(body.name, body.account_id);
   } else {
     return NextResponse.json({
       status: "error",
