@@ -37,7 +37,6 @@ export function LinkedInConnectForm({
       const supabase = await createClient();
       const { data: user } = await supabase.auth.getUser();
       if (!user?.user) {
-        console.log("No user");
         toastErrorPop("No user", "No user found");
         return;
       }
@@ -50,7 +49,7 @@ export function LinkedInConnectForm({
         (process.env.NEXT_ENV === "development"
           ? "http://localhost:3000/dashboard"
           : "https://auto-commenter.vercel.app/") + cancelUrl,
-        true,
+        false,
         user?.user.id
       );
 

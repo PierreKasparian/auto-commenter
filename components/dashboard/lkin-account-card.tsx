@@ -16,6 +16,7 @@ import {
   toastErrorPop,
 } from "@/utils/helpers";
 import { createClient } from "@/utils/supabase/server";
+import { LinkedInConnectForm } from "./lkin-form";
 
 export async function LinkedInAccountCard({
   unipileId,
@@ -31,7 +32,7 @@ export async function LinkedInAccountCard({
     "Success",
     "Connection successful"
   );
-  if (!unipileId || !url) {
+  if (!unipileId) {
     console.log("full connection");
     const supabase = await createClient();
     const { data: user } = await supabase.auth.getUser();
@@ -102,12 +103,12 @@ export async function LinkedInAccountCard({
             </Button> */}
           </div>
         ) : (
-          // : !unipileId || !url ? (
-          //   <LinkedInConnectForm
-          //     unipileId={unipileId}
-          //     reconnectForTrial={!url && !!unipileId}
-          //   />
-          // )
+          !url ? (
+            <LinkedInConnectForm
+              unipileId={unipileId}
+              reconnectForTrial={!url && !!unipileId}
+            />
+          ) :
           <Link href={url}>
             <Button>Connect</Button>
           </Link>
