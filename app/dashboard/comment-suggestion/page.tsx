@@ -1,78 +1,21 @@
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LinkedInAccountCard } from "@/components/dashboard/lkin-account-card";
-import { getUnipileId } from "@/utils/supabase/queries";
-import { Navbar } from "@/components/navbar";
-import CommentProposalsComponent from "@/components/dashboard/comment-proposal/comment-proposals";
-import { getCommentsProposals } from "@/utils/supabase/queries";
-import { isUnipileAccountConnected } from "@/utils/helpers";
-import { CommentProposal } from "@/types";
-import { isTrialEnded } from "@/utils/supabase/queries";
-import Link from "next/link";
-const CommentSuggestionPage = async () => {
+import React, { Suspense } from "react";
+import { getUnipileId, hasSuggestionBeenDone } from "@/utils/supabase/queries";
+
+import CommentProposalWrapper from "@/components/dashboard/comment-proposal/comment-proposal-wrapper";
+import DashboardLoading from "@/components/dashboard/DashboardLoading";
+const Page = async () => {
   const unipile_id = await getUnipileId();
-  console.log(unipile_id);
-  const hasSubscription = !(await isTrialEnded(unipile_id));
-  console.log(hasSubscription);
-  let isConnected = false;
-  let commentsProposals: CommentProposal[] = [];
-  if (hasSubscription) {
-    isConnected = await isUnipileAccountConnected(unipile_id ?? "");
-    commentsProposals = (await getCommentsProposals(
-      unipile_id ?? undefined
-    )) as unknown as CommentProposal[];
-  }
+
+  const didGenerateComm = unipile_id
+    ? await hasSuggestionBeenDone(unipile_id)
+    : false;
   return (
-    <>
-      <Navbar isDashboard={true} />
-      <div className="container mx-auto px-4 py-8">
-        <div className="space-y-8 w-full">
-          {!hasSubscription && unipile_id ? (
-            <div className="w-full">
-              <Card className="w-full">
-                <CardHeader>
-                  <CardTitle className="text-2xl font-semibold mb-2">
-                    Get Started with Auto-Commenter
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="">
-                  <p className="text-muted-foreground mb-6">
-                    Unlock the power of automated LinkedIn engagement with our
-                    premium features.
-                  </p>
-                  <Link
-                    href="/dashboard/purchase-credits"
-                    className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 bg-teal-600 text-white hover:bg-teal-700 h-10 px-4 py-2"
-                  >
-                    Purchase Credits
-                  </Link>
-                </CardContent>
-              </Card>
-            </div>
-          ) : (
-            unipile_id &&
-            isConnected && (
-                <div className="space-y-8 w-full">
-                  <CommentProposalsComponent
-                    commentsProposals={commentsProposals}
-                  />
-                </div>
-            )
-          )}
-          {(hasSubscription || !unipile_id) && (
-            <div className="w-full">
-                <LinkedInAccountCard
-                  unipileId={unipile_id}
-                  isConnected={isConnected}
-                />
-              </div>
-          )}
-        </div>
-      </div>
-    </>
+    <Suspense fallback={<DashboardLoading didGenerateComm={didGenerateComm} />}>
+      <CommentProposalWrapper unipile_id={unipile_id} didGenerateComm={didGenerateComm} />
+    </Suspense>
   );
 };
 
-export default CommentSuggestionPage;
+export default Page;

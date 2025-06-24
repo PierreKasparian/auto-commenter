@@ -24,7 +24,7 @@ async function browsePosts(
   data: AccountNkw,
   posts: LinkedInPost[],
   isKeywords = false,
-  n_comments = 0,
+  n_comments = 0
 ) {
   for (let i = 0; i < (isKeywords ? 1 : 2); i++) {
     let selectedLang: string[];
@@ -153,6 +153,13 @@ async function createComment(
     attachments: attachUrls,
   });
   if (error) return { error: error };
+  const { error: updateError } = await supabase
+    .from("comment_time")
+    .update({
+      done: true,
+    })
+    .eq("unipile_id", account_id);
+  if (updateError) return { error: updateError };
   return { error: null };
 }
 
@@ -236,16 +243,25 @@ export async function POST(req: Request) {
     })
     .catch((error) => console.error(error));
   console.log(JSON.stringify(posts.items?.[0]));
-console.log(data.accounts?.accounts)
-  const accountsPosts = await getUserPosts(data.accounts?.accounts ?? [], account_id);
+  console.log(data.accounts?.accounts);
+  const accountsPosts = await getUserPosts(
+    data.accounts?.accounts ?? [],
+    account_id
+  );
   console.log(JSON.stringify(accountsPosts?.[0]));
   console.log(
     "\n--------------------------------------\n\n" + data.com_per_day_max,
     posts.items?.length
   );
-// return
-  await browsePosts(account_id, data, posts.items,true);
-  await browsePosts(account_id, data, accountsPosts,false,-accountsPosts.length );
+  // return
+  await browsePosts(account_id, data, posts.items, true);
+  await browsePosts(
+    account_id,
+    data,
+    accountsPosts,
+    false,
+    -accountsPosts.length
+  );
 
   return NextResponse.json({ ok: true });
 }

@@ -220,3 +220,17 @@ export const isTrialEnded = async (unipile_id: string | null) => {
   if (!data.end_trial) return false;
   return new Date(data.end_trial) < new Date();
 };
+
+export const hasSuggestionBeenDone = async (unipile_id: string) => {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("comment_time")
+    .select("done")
+    .eq("unipile_id", unipile_id)
+    .single();
+  if (error) {
+    console.log(error);
+    return false;
+  }
+  return data.done;
+};
