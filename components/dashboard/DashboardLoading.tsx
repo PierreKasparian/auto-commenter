@@ -15,8 +15,8 @@ export default function DashboardLoading({
               <div className="w-full">
                 <div className="mb-8">
                   <h1 className="text-2xl font-bold text-gray-900">{!didGenerateComm
-              ? "Generating your comments proposals. This can take a moment..."
-              : "Loading your comments proposals..."}</h1>
+              ? "Generating your comments suggestions. This can take a moment..."
+              : "Loading your comments suggestions..."}</h1>
                   <p className="text-gray-600 mt-2">
                     Review AI-generated comments for LinkedIn posts matching your keywords
                     and preferences

@@ -154,13 +154,6 @@ async function createComment(
     attachments: attachUrls,
   });
   if (error) return { error: error };
-  const { error: updateError } = await supabase
-    .from("comment_time")
-    .update({
-      done: true,
-    })
-    .eq("unipile_id", account_id);
-  if (updateError) return { error: updateError };
   return { error: null };
 }
 
@@ -255,17 +248,27 @@ export async function POST(req: Request) {
     posts.items?.length
   );
   // return
-  console.log(posts)
-  if(posts.status!=400){ 
-    console.log('DEDANS')
-    await browsePosts(account_id, data, posts.items, true)};
-  await browsePosts(
-    account_id,
-    data,
-    accountsPosts,
-    false,
-    -accountsPosts.length
-  );
-
+  console.log("accountsPosts");
+  console.log(accountsPosts);
+  try {
+    await browsePosts(
+      account_id,
+      data,
+      accountsPosts,
+      false,
+      -accountsPosts.length
+    );
+    if (posts.status != 400)
+      await browsePosts(account_id, data, posts.items, true);
+  } catch (error) {
+    console.log(error);
+  }
+  const { error: updateError } = await supabase
+    .from("comment_time")
+    .update({
+      done: true,
+    })
+    .eq("unipile_id", account_id);
+  if (updateError) console.log({ error: updateError });
   return NextResponse.json({ ok: true });
 }
