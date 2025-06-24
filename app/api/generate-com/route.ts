@@ -26,6 +26,7 @@ async function browsePosts(
   isKeywords = false,
   n_comments = 0
 ) {
+  console.log(posts);
   for (let i = 0; i < (isKeywords ? 1 : 2); i++) {
     let selectedLang: string[];
     if (isKeywords) {
@@ -254,7 +255,10 @@ export async function POST(req: Request) {
     posts.items?.length
   );
   // return
-  await browsePosts(account_id, data, posts.items, true);
+  console.log(posts)
+  if(posts.status!=400){ 
+    console.log('DEDANS')
+    await browsePosts(account_id, data, posts.items, true)};
   await browsePosts(
     account_id,
     data,

@@ -30,7 +30,7 @@ const CommentSuggestionPage = async ({unipile_id, didGenerateComm}:{unipile_id:s
           }),
           redirect: "follow"
         };
-        await fetch("https://auto-commenter.vercel.app/api/generate-com", requestOptions1 as RequestInit);
+        await fetch(process.env.NEXT_ENV === "development" ? "http://localhost:3000/api/generate-com" : "https://auto-commenter.vercel.app/api/generate-com", requestOptions1 as RequestInit);
     }
     commentsProposals = (await getCommentsProposals(
       unipile_id ?? undefined
