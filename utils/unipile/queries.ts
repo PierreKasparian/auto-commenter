@@ -191,19 +191,37 @@ export async function linkedinConnect(accessToken: string, userAgent: string) {
   redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
 }
 
-export const getUnipileReconnectUrl = async (unipile_id: string) => {
+export const getUnipileConnectUrl = async (
+  success_url: string,
+  failure_url: string,
+  isConnect: boolean,
+  unipile_id?: string,
+) => {
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
   myHeaders.append("accept", "application/json");
   myHeaders.append("content-type", "application/json");
 
-  const raw = JSON.stringify({
-    type: "reconnect",
-    providers: "*",
-    expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-    api_url: "https://api16.unipile.com:14661/api/v1/accounts",
-    reconnect_account: unipile_id,
-  });
+  const raw = JSON.stringify(
+    isConnect
+      ? {
+          type: "create",
+          providers: "*",
+          expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+          api_url: "https://api16.unipile.com:14661",
+          success_redirect_url: success_url,
+          failure_redirect_url: failure_url,
+        }
+      : {
+          type: "reconnect",
+          providers: "*",
+          expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+          api_url: "https://api16.unipile.com:14661",
+          reconnect_account: unipile_id,
+          success_redirect_url: success_url,
+          failure_redirect_url: failure_url,
+        }
+  );
 
   const requestOptions = {
     method: "POST",
@@ -359,7 +377,7 @@ export async function getUserPosts(public_ids: string[], unipile_id: string) {
       .catch((error) => console.log(error));
     console.log(response2);
 
-    posts= [...posts, ...response2.items];
+    posts = [...posts, ...response2.items];
   }
 
   return posts;

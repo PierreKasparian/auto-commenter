@@ -8,7 +8,7 @@ import {
 import { LinkedInConnectForm } from "./lkin-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Linkedin } from "lucide-react";
-import { getUnipileReconnectUrl } from "@/utils/unipile/queries";
+import { getUnipileConnectUrl } from "@/utils/unipile/queries";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -21,7 +21,7 @@ export async function LinkedInAccountCard({
 }) {
   let url;
   if (!isConnected) {
-    url = await getUnipileReconnectUrl(unipileId!);
+    url = await getUnipileConnectUrl(process.env.NEXT_ENV==="development"?"http://localhost:3000/dashboard":"https://auto-commenter.vercel.app/dashboard",process.env.NEXT_ENV==="development"?"http://localhost:3000/dashboard":"https://auto-commenter.vercel.app/dashboard",false,unipileId!);
     console.log('url',url)
   }
   return (
