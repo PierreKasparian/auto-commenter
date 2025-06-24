@@ -5,12 +5,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { LinkedInConnectForm } from "./lkin-form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Linkedin } from "lucide-react";
 import { getUnipileConnectUrl } from "@/utils/unipile/queries";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import {
+  getStatusRedirect,
+  getErrorRedirect,
+  toastErrorPop,
+} from "@/utils/helpers";
+import { createClient } from "@/utils/supabase/server";
 
 export async function LinkedInAccountCard({
   unipileId,
@@ -20,10 +25,46 @@ export async function LinkedInAccountCard({
   isConnected: boolean;
 }) {
   let url;
-  if (!isConnected) {
-    url = await getUnipileConnectUrl(process.env.NEXT_ENV==="development"?"http://localhost:3000/dashboard":"https://auto-commenter.vercel.app/dashboard",process.env.NEXT_ENV==="development"?"http://localhost:3000/dashboard":"https://auto-commenter.vercel.app/dashboard",false,unipileId!);
-    console.log('url',url)
+  const cancelUrl = getErrorRedirect("/dashboard", "Connection issued");
+  const successUrl = getStatusRedirect(
+    "/dashboard",
+    "Success",
+    "Connection successful"
+  );
+  if (!unipileId || !url) {
+    console.log("full connection");
+    const supabase = await createClient();
+    const { data: user } = await supabase.auth.getUser();
+    if (!user?.user) {
+      console.log("No user");
+      toastErrorPop("No user", "No user found");
+      return;
+    }
+    // await linkedinConnect(accessToken, userAgent)
+    url = await getUnipileConnectUrl(
+      (process.env.NEXT_ENV === "development"
+        ? "http://localhost:3000/"
+        : "https://auto-commenter.vercel.app/") + successUrl,
+      (process.env.NEXT_ENV === "development"
+        ? "http://localhost:3000/"
+        : "https://auto-commenter.vercel.app/") + cancelUrl,
+      true,
+      user?.user.id
+    );
+  } else if (!isConnected) {
+    console.log("recconection");
+    url = await getUnipileConnectUrl(
+      (process.env.NEXT_ENV === "development"
+        ? "http://localhost:3000/"
+        : "https://auto-commenter.vercel.app/") + successUrl,
+      (process.env.NEXT_ENV === "development"
+        ? "http://localhost:3000/"
+        : "https://auto-commenter.vercel.app/") + cancelUrl,
+      false,
+      unipileId!
+    );
   }
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -60,11 +101,15 @@ export async function LinkedInAccountCard({
               Disconnect
             </Button> */}
           </div>
-        ) : !unipileId || (!url) ? (
-          <LinkedInConnectForm unipileId={unipileId} reconnectForTrial={!url && !!unipileId}/>
         ) : (
+          // : !unipileId || !url ? (
+          //   <LinkedInConnectForm
+          //     unipileId={unipileId}
+          //     reconnectForTrial={!url && !!unipileId}
+          //   />
+          // )
           <Link href={url}>
-            <Button>Reconnect</Button>
+            <Button>Connect</Button>
           </Link>
         )}
       </CardContent>

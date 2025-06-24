@@ -6,7 +6,11 @@ import { LinkedInTokenInfoDialog } from "./find-tok-dialog";
 import { fuckUnipile, getUnipileConnectUrl } from "@/utils/unipile/queries";
 import { useState } from "react";
 import { redirectToPath } from "@/utils/supabase/server";
-import { getStatusRedirect, getErrorRedirect, toastErrorPop } from "@/utils/helpers";
+import {
+  getStatusRedirect,
+  getErrorRedirect,
+  toastErrorPop,
+} from "@/utils/helpers";
 import { createClient } from "@/utils/supabase/client";
 
 export function LinkedInConnectForm({
