@@ -1,11 +1,10 @@
 "use server";
 import { redirect } from "next/navigation";
 import { getErrorRedirect, getStatusRedirect } from "../helpers";
-import { qdrantSavePost, qdrantUpdateUnipileId } from "../qdrant/queries";
+import { qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { getUnipileId } from "../supabase/queries";
 import { LinkedInPost } from "@/types";
-import { NextResponse } from "next/server";
 
 export async function getPostFromId(postId: string, unipileId: string) {
   console.log("postID : ", postId, "unipileId", unipileId);
@@ -104,147 +103,101 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
   };
 }
 
-export async function linkedinConnect(accessToken: string, userAgent: string) {
-  const myHeaders = new Headers();
-  myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
-  myHeaders.append("accept", "application/json");
-  myHeaders.append("content-type", "application/json");
+// export async function linkedinConnect(accessToken: string, userAgent: string) {
+//   const myHeaders = new Headers();
+//   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);
+//   myHeaders.append("accept", "application/json");
+//   myHeaders.append("content-type", "application/json");
 
-  const raw = JSON.stringify({
-    provider: "LINKEDIN",
-    access_token: accessToken,
-    user_agent: userAgent,
-  });
+//   const raw = JSON.stringify({
+//     provider: "LINKEDIN",
+//     access_token: accessToken,
+//     user_agent: userAgent,
+//   });
 
-  const requestOptions = {
-    method: "POST",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow",
-  };
+//   const requestOptions = {
+//     method: "POST",
+//     headers: myHeaders,
+//     body: raw,
+//     redirect: "follow",
+//   };
 
-  const response = await fetch(
-    "https://api16.unipile.com:14661/api/v1/accounts",
-    requestOptions as RequestInit
-  ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
-  await new Promise((resolve) => setTimeout(resolve, 7000));
-  console.log(response);
-  const result = await response.json();
-  if (result.object == "AccountCreated") {
-    const supabase = await createClient();
-    const { data, error } = await supabase.auth.getUser();
-    if (error) {
-      console.log(error);
-      redirect(getErrorRedirect("/dashboard", error.message));
-    }
-    if (!data.user) {
-      console.log("No user");
-      redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
-    }
-    const provider_id = await getProviderId(result.account_id);
-    console.log("provider_id", provider_id);
-    const { profileDescription, profileName } = await getProfilDesc(
-      result.account_id,
-      provider_id
-    );
-    console.log(profileDescription);
-    const { error: unipileError } = await supabase.from("unipile_id").insert({
-      unipile_id: result.account_id,
-      user_id: data.user.id,
-      com_per_day_max: 2, //a changer
-      profile_description: profileDescription ?? "",
-      profile_name: profileName,
-    });
-    if (unipileError) {
-      console.log(unipileError);
-      redirect(getErrorRedirect("/dashboard", "No user", unipileError.message));
-    }
+//   const response = await fetch(
+//     "https://api16.unipile.com:14661/api/v1/accounts",
+//     requestOptions as RequestInit
+//   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
+//   await new Promise((resolve) => setTimeout(resolve, 7000));
+//   console.log(response);
+//   const result = await response.json();
+//   if (result.object == "AccountCreated") {
+//     const supabase = await createClient();
+//     const { data, error } = await supabase.auth.getUser();
+//     if (error) {
+//       console.log(error);
+//       redirect(getErrorRedirect("/dashboard", error.message));
+//     }
+//     if (!data.user) {
+//       console.log("No user");
+//       redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
+//     }
+//     const provider_id = await getProviderId(result.account_id);
+//     console.log("provider_id", provider_id);
+//     const { profileDescription, profileName } = await getProfilDesc(
+//       result.account_id,
+//       provider_id
+//     );
+//     console.log(profileDescription);
+//     const { error: unipileError } = await supabase.from("unipile_id").insert({
+//       unipile_id: result.account_id,
+//       user_id: data.user.id,
+//       com_per_day_max: 2, //a changer
+//       profile_description: profileDescription ?? "",
+//       profile_name: profileName,
+//     });
+//     if (unipileError) {
+//       console.log(unipileError);
+//       redirect(getErrorRedirect("/dashboard", "No user", unipileError.message));
+//     }
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    try {
-      const comments = await getUserComments(result.account_id, provider_id);
-      console.log("comments", comments);
-      for (const comment of comments.items.slice(0, 20)) {
-        if (comment.text.length > 15 && comment.author === profileName) {
-          const post = await getPostFromId(comment.post_urn, result.account_id);
-          await qdrantSavePost(post.text, comment.text, result.account_id);
-          await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
-        }
-      }
-    } catch (error) {
-      console.log(error);
-      redirect(
-        getErrorRedirect(
-          "/dashboard",
-          "Error",
-          "Error retrieving your comments"
-        )
-      );
-    }
-    redirect(
-      getStatusRedirect(
-        "/dashboard",
-        "Success ! 🎉",
-        "Your account has been successfully connected"
-      )
-    );
-  }
-  redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
-}
+//     await new Promise((resolve) => setTimeout(resolve, 2000));
+//     try {
+//       const comments = await getUserComments(result.account_id, provider_id);
+//       console.log("comments", comments);
+//       for (const comment of comments.items.slice(0, 20)) {
+//         if (comment.text.length > 15 && comment.author === profileName) {
+//           const post = await getPostFromId(comment.post_urn, result.account_id);
+//           await qdrantSavePost(post.text, comment.text, result.account_id);
+//           await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
+//         }
+//       }
+//     } catch (error) {
+//       console.log(error);
+//       redirect(
+//         getErrorRedirect(
+//           "/dashboard",
+//           "Error",
+//           "Error retrieving your comments"
+//         )
+//       );
+//     }
+//     redirect(
+//       getStatusRedirect(
+//         "/dashboard",
+//         "Success ! 🎉",
+//         "Your account has been successfully connected"
+//       )
+//     );
+//   }
+//   redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
+// }
 
-export async function onSuccessConnect(user_id: string, unipile_id: string) {
-  const supabase = await createClient();
-  const provider_id = await getProviderId(unipile_id);
-  console.log("provider_id", provider_id);
-  const { profileDescription, profileName } = await getProfilDesc(
-    unipile_id,
-    provider_id
-  );
-  console.log(profileDescription);
-  const { error: unipileError } = await supabase.from("unipile_id").insert({
-    unipile_id: unipile_id,
-    user_id: user_id,
-    com_per_day_max: 2, //a changer
-    profile_description: profileDescription ?? "",
-    profile_name: profileName,
-  });
-  if (unipileError) {
-    console.log(unipileError);
-    return NextResponse.json({
-      status: "error",
-      message: "Error connecting your account",
-    });
-  }
 
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-  try {
-    const comments = await getUserComments(unipile_id, provider_id);
-    console.log("comments", comments);
-    for (const comment of comments.items.slice(0, 20)) {
-      if (comment.text.length > 15 && comment.author === profileName) {
-        const post = await getPostFromId(comment.post_urn, unipile_id);
-        await qdrantSavePost(post.text, comment.text, unipile_id);
-        await new Promise((resolve) => setTimeout(resolve, 1)); //ids are time generated}
-      }
-    }
-  } catch (error) {
-    console.log(error);
-    return NextResponse.json({
-      status: "error",
-      message: "Error connecting your account",
-    });
-  }
-  return NextResponse.json({
-    status: "success",
-    message: "Your account has been successfully connected",
-  });
-}
 
 export const getUnipileConnectUrl = async (
   success_url: string,
   failure_url: string,
   isConnect: boolean,
-  id?: string
+  id: string
 ) => {
   const myHeaders = new Headers();
   myHeaders.append("X-API-KEY", process.env.UNIPILE_API_KEY!);

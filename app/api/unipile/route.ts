@@ -1,4 +1,4 @@
-import { onSuccessConnect } from "@/utils/unipile/queries";
+import { onSuccessConnect } from "./libs";
 import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const body = await req.json();
