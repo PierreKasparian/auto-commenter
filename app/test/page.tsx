@@ -12,7 +12,7 @@
 const page = async () => {
   // const a=await  getUnipileConnectUrl(process.env.NEXT_ENV==="development"?"http://localhost:3000/dashboard":"https://auto-commenter.vercel.app/dashboard",process.env.NEXT_ENV==="development"?"http://localhost:3000/dashboard":"https://auto-commenter.vercel.app/dashboard",false,"dUkzravjSYuZcjJkTDmE0A");
   //getUnipileConnectUrl("http://localhost:3000/dashboard","http://localhost:3000/dashboard",true)
-  console.log(a)
+  // console.log(a)
   return <>
   {/* <a href={a}>Connect</a> */}
   </>
