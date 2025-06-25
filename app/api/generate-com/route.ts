@@ -250,6 +250,13 @@ export async function POST(req: Request) {
   // return
   console.log("accountsPosts");
   console.log(accountsPosts);
+  const { error: updateError } = await supabase
+    .from("comment_time")
+    .update({
+      done: true,
+    })
+    .eq("unipile_id", account_id);
+  if (updateError) console.log({ error: updateError });
   try {
     await browsePosts(
       account_id,
@@ -263,12 +270,6 @@ export async function POST(req: Request) {
   } catch (error) {
     console.log(error);
   }
-  const { error: updateError } = await supabase
-    .from("comment_time")
-    .update({
-      done: true,
-    })
-    .eq("unipile_id", account_id);
-  if (updateError) console.log({ error: updateError });
+  
   return NextResponse.json({ ok: true });
 }
