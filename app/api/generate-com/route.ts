@@ -250,13 +250,23 @@ export async function POST(req: Request) {
   // return
   console.log("accountsPosts");
   console.log(accountsPosts);
-  const { error: updateError } = await supabase
-    .from("comment_time")
-    .update({
-      done: true,
-    })
-    .eq("unipile_id", account_id);
-  if (updateError) console.log({ error: updateError });
+  const { error: upsertError } = await supabase
+  .from("comment_time")
+  .upsert(
+    [
+      {
+        unipile_id: account_id,
+        comment_time: "0",
+        created_at: new Date().toISOString(),
+        done: true,
+      },
+    ],
+    {
+      onConflict: "unipile_id",
+      ignoreDuplicates: false,
+    }
+  );
+  if (upsertError) console.log({ error: upsertError });
   try {
     await browsePosts(
       account_id,
