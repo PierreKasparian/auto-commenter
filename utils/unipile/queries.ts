@@ -409,7 +409,7 @@ export async function unipileSignUp(
     true,
     isFuckUnipile
       ? "FuckUnipile " + unipileId + " " + user?.user.id
-      : "normalLogin " + user?.user.id
+      : user?.user.id
   );
   return url;
 }
