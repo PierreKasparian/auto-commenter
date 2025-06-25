@@ -1,6 +1,6 @@
 "use server";
 import { redirect } from "next/navigation";
-import { getErrorRedirect, getStatusRedirect } from "../helpers";
+import { getErrorRedirect, getStatusRedirect, toastErrorPop } from "../helpers";
 import { qdrantUpdateUnipileId } from "../qdrant/queries";
 import { createClient } from "../supabase/server";
 import { getUnipileId } from "../supabase/queries";
@@ -190,8 +190,6 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
 //   }
 //   redirect(getErrorRedirect("/dashboard", "No user", "No user found"));
 // }
-
-
 
 export const getUnipileConnectUrl = async (
   success_url: string,
@@ -386,4 +384,32 @@ export async function getUserPosts(public_ids: string[], unipile_id: string) {
   }
 
   return posts;
+}
+export async function unipileSignUp(
+  successUrl: string,
+  cancelUrl: string,
+  isFuckUnipile = false,
+  unipileId?: string
+) {
+  const supabase = await createClient();
+  const { data: user } = await supabase.auth.getUser();
+  if (!user?.user) {
+    console.log("No user");
+    toastErrorPop("No user", "No user found");
+    return;
+  }
+  // await linkedinConnect(accessToken, userAgent)
+  const url = await getUnipileConnectUrl(
+    (process.env.NEXT_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://auto-commenter.vercel.app") + successUrl,
+    (process.env.NEXT_ENV === "development"
+      ? "http://localhost:3000"
+      : "https://auto-commenter.vercel.app") + cancelUrl,
+    true,
+    isFuckUnipile
+      ? "FuckUnipile " + unipileId + " " + user?.user.id
+      : "normalLogin " + user?.user.id
+  );
+  return url;
 }

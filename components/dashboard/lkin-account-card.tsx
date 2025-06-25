@@ -7,15 +7,13 @@ import {
 } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Linkedin } from "lucide-react";
-import { getUnipileConnectUrl } from "@/utils/unipile/queries";
+import { getUnipileConnectUrl,unipileSignUp } from "@/utils/unipile/queries";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
   getStatusRedirect,
   getErrorRedirect,
-  toastErrorPop,
 } from "@/utils/helpers";
-import { createClient } from "@/utils/supabase/server";
 import { LinkedInConnectForm } from "./lkin-form";
 
 export async function LinkedInAccountCard({
@@ -34,24 +32,7 @@ export async function LinkedInAccountCard({
   );
   if (!unipileId) {
     console.log("full connection");
-    const supabase = await createClient();
-    const { data: user } = await supabase.auth.getUser();
-    if (!user?.user) {
-      console.log("No user");
-      toastErrorPop("No user", "No user found");
-      return;
-    }
-    // await linkedinConnect(accessToken, userAgent)
-    url = await getUnipileConnectUrl(
-      (process.env.NEXT_ENV === "development"
-        ? "http://localhost:3000"
-        : "https://auto-commenter.vercel.app") + successUrl,
-      (process.env.NEXT_ENV === "development"
-        ? "http://localhost:3000"
-        : "https://auto-commenter.vercel.app") + cancelUrl,
-      true,
-      user?.user.id
-    );
+    url = await unipileSignUp(successUrl,cancelUrl);
   } else if (!isConnected) {
     console.log("recconection");
     url = await getUnipileConnectUrl(
@@ -64,6 +45,9 @@ export async function LinkedInAccountCard({
       false,
       unipileId!
     );
+  }
+  if (!url && unipileId){
+    url = await unipileSignUp(successUrl,cancelUrl, true,unipileId);
   }
 
   return (
