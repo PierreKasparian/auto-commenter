@@ -61,6 +61,10 @@ export default function AccountsChoose({unipileId, accounts}: {unipileId: string
                 return;
               }
               try {
+                if (value.includes("/company/")) {
+                  toastErrorPop("Error", "Company accounts are not yet supported")
+                  return;
+                }
                 const parts = value.split("/");
                 if (parts.length < 2) {
                   setNewAccount("");
