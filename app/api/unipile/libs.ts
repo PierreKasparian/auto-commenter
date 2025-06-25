@@ -5,7 +5,6 @@ import { NextResponse } from "next/server";
 import { getUserComments } from "@/utils/unipile/queries";
 import { qdrantSavePost, qdrantUpdateUnipileId } from "@/utils/qdrant/queries";
 import { getPostFromId } from "@/utils/unipile/queries";
-import Error from "next/error";
 export async function onSuccessConnect(user_id: string, unipile_id: string) {
   const supabase = await createClient();
   const provider_id = await getProviderId(unipile_id);
@@ -70,13 +69,13 @@ export async function fuckUnipile(
     .eq("user_id", user_id);
   if (unipileError) {
     console.log(unipileError);
-    return new Error({
+    return NextResponse.json({
+      status: "error",
       message: "Error connecting your account",
-      statusCode: 500,
-    });
+    }, { status: 500 });
   }
-  return new Error({
-    message: "Error connecting your account",
-    statusCode: 500,
-  });
+  return NextResponse.json({
+    status: "success",
+    message: "Your account has been successfully connected",
+  }, { status: 200 });
 }
