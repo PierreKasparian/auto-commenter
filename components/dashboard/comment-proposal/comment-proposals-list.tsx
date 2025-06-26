@@ -1,11 +1,13 @@
 import { CommentProposal } from "@/types"
 import { CommentProposalCard } from "./comment-proposal-card"
+import { generateSummary } from "@/utils/server"
 // import { acceptCommentProposal, rejectCommentProposal } from "./actions"
 
 // This would typically come from a database
 
 
 export async function CommentProposalsList({commentsProposals}: {commentsProposals: CommentProposal[] | null}) {
+
 
 
   if (!commentsProposals || commentsProposals.length === 0) {
@@ -38,15 +40,14 @@ export async function CommentProposalsList({commentsProposals}: {commentsProposa
   }
 
   return (
-    <div className="space-y-6">
-      {commentsProposals.map((proposal) => (
-        <CommentProposalCard
-          key={proposal.id}
-          proposal={proposal}
-          // onAccept={acceptCommentProposal}
-          // onReject={rejectCommentProposal}
-        />
-      ))}
-    </div>
+      <div className="space-y-6">
+        {commentsProposals.map((proposal) => (
+          <CommentProposalCard
+            key={proposal.id}
+            proposal={proposal}
+            generateSummary = {generateSummary}
+          />
+        ))}
+      </div>
   )
 }

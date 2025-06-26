@@ -101,7 +101,7 @@ export const languagesSupported = [
   // { value: "dz", label: "Dzongkha" },
   // { value: "egy", label: "Egyptian" },
   // { value: "el", label: "Greek" },
-  { value: "en", label: "English", smallWords:["the ", "and ", " a "] },
+  { value: "en", label: "English", smallWords: ["the ", "and ", " a "] },
   // { value: "eo", label: "Esperanto" },
   // { value: "es", label: "Spanish" },
   // { value: "et", label: "Estonian" },
@@ -110,7 +110,7 @@ export const languagesSupported = [
   // { value: "fi", label: "Finnish" },
   // { value: "fj", label: "Fijian" },
   // { value: "fo", label: "Faroese" },
-  { value: "fr", label: "French", smallWords:["un ", "le "] },
+  { value: "fr", label: "French", smallWords: ["un ", "le "] },
   // { value: "fy", label: "Frisian" },
   // { value: "ga", label: "Irish" },
   // { value: "gd", label: "Scots Gaelic" },
@@ -304,7 +304,10 @@ export const toastErrorPop = (error: string, error_description: string) => {
   window.history.pushState({}, "", newUrl);
 };
 
-export const checkAccountConnected=async(user_id : string,account_id:string)=>{
+export const checkAccountConnected = async (
+  user_id: string,
+  account_id: string
+) => {
   if (!(await isUnipileAccountConnected(account_id))) {
     const adminAuthClient = createAdminClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -316,9 +319,7 @@ export const checkAccountConnected=async(user_id : string,account_id:string)=>{
         },
       }
     ).auth.admin;
-    const { data } = await adminAuthClient.getUserById(
-      user_id
-    );
+    const { data } = await adminAuthClient.getUserById(user_id);
     console.log("Account not connected");
     await sendMail(
       data.user?.email ?? "",
@@ -333,4 +334,4 @@ Pierre`
     return false;
   }
   return true;
-}
+};

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { Button } from "@/components/ui/button";
 import { ExternalLink, Check, X, Clock } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
@@ -13,9 +14,27 @@ import Image from "next/image";
 
 interface CommentProposalCardProps {
   proposal: CommentProposal;
+  generateSummary: (text: string,id:string) => Promise<any>;
 }
 
-export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
+export function CommentProposalCard({ proposal, generateSummary }: CommentProposalCardProps) {
+  const [summary, setSummary] = useState<string | null>(null);
+  const [loadingSummary, setLoadingSummary] = useState(false);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+  const handleSummarize = async () => {
+    setLoadingSummary(true);
+    setSummary(null);
+    setSummaryError(null);
+    try {
+      const response = await generateSummary(proposal.post_text, proposal.id);
+      if (!response) throw new Error("Erreur lors du résumé");
+      setSummary(response);
+    } catch (e: any) {
+      setSummaryError(e.message || "Erreur inconnue");
+    } finally {
+      setLoadingSummary(false);
+    }
+  };
   const [isProcessing, setIsProcessing] = useState(false);
   const [actionType, setActionType] = useState<"accept" | "reject" | null>(
     null
@@ -69,7 +88,6 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
       setActionType(null);
     }
   };
-
   return (
     <div className="bg-white rounded-xl shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
       {/* Header */}
@@ -133,6 +151,36 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
               {/* Colonne image (50%) */}
               {proposal.attachments && proposal.attachments.length > 0 && (
                 <div className="w-1/2 flex flex-col space-y-2 max-h-[700px] overflow-y-scroll">
+                  {(proposal.IA_summarize || summary || summaryError) && (
+                    <div
+                      className={`mt-4 p-4  border ${
+                        summaryError
+                          ? "border-red-200 bg-red-50"
+                          : "border-teal-200 bg-teal-50"
+                      } rounded`}
+                    >
+                      <div
+                        className={`font-semibold mb-2 text-teal-700 ${
+                          summaryError ? "text-red-700" : ""
+                        }`}
+                      >
+                        Résumé IA
+                      </div>
+                      <div
+                        className={`text-gray-800 whitespace-pre-line ${
+                          summaryError ? "text-red-700" : ""
+                        }`}
+                      >
+                        {summaryError ? (
+                          summaryError
+                        ) : (
+                          <ReactMarkdown>
+                            {proposal.IA_summarize || summary || ""}
+                          </ReactMarkdown>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   {proposal.attachments.map((attachment) => (
                     <div key={attachment} className="w-full h-full">
                       <Image
@@ -211,6 +259,18 @@ export function CommentProposalCard({ proposal }: CommentProposalCardProps) {
             )}
             Accept & Post
           </Button>
+          {/* Bouton résumer seulement si pas déjà de résumé IA */}
+          {!proposal.IA_summarize && !summary && !summaryError && (
+            <Button
+              onClick={handleSummarize}
+              variant="secondary"
+              className="flex-1 border-teal-200 text-teal-700 hover:bg-teal-50 hover:border-teal-300"
+              type="button"
+              disabled={loadingSummary}
+            >
+              {loadingSummary ? "Résumé en cours..." : "Résumer"}
+            </Button>
+          )}
         </div>
       </div>
     </div>

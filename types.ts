@@ -141,7 +141,8 @@ export interface CommentProposal {
       timezone: string;
     };
   };
-  attachments:string[]
+  attachments:string[],
+  IA_summarize?: string
 }
 [];
 

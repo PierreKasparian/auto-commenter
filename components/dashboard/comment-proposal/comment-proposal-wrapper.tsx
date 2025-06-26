@@ -39,7 +39,7 @@ const CommentSuggestionPage = async ({unipile_id, didGenerateComm}:{unipile_id:s
   return (
     <>
       <Navbar isDashboard={true} />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto py-8">
         <div className="space-y-8 w-full">
           {!hasSubscription && unipile_id ? (
             <div className="w-full">
