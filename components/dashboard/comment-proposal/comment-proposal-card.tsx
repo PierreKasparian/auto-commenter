@@ -14,7 +14,7 @@ import Image from "next/image";
 
 interface CommentProposalCardProps {
   proposal: CommentProposal;
-  generateSummary: (text: string,id:string) => Promise<any>;
+  generateSummary: (text: string,id:string) => Promise<string>;
 }
 
 export function CommentProposalCard({ proposal, generateSummary }: CommentProposalCardProps) {
