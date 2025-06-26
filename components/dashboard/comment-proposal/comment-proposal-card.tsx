@@ -29,8 +29,8 @@ export function CommentProposalCard({ proposal, generateSummary }: CommentPropos
       const response = await generateSummary(proposal.post_text, proposal.id);
       if (!response) throw new Error("Erreur lors du résumé");
       setSummary(response);
-    } catch (e: any) {
-      setSummaryError(e.message || "Erreur inconnue");
+    } catch (e) {
+      setSummaryError((e as Error).message || "Erreur inconnue");
     } finally {
       setLoadingSummary(false);
     }
