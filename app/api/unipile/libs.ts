@@ -17,7 +17,7 @@ export async function onSuccessConnect(user_id: string, unipile_id: string) {
   const { error: unipileError } = await supabase.from("unipile_id").insert({
     unipile_id: unipile_id,
     user_id: user_id,
-    com_per_day_max: 2, //a changer
+    com_per_day_max: 4, //a changer
     profile_description: profileDescription ?? "",
     profile_name: profileName,
   });
