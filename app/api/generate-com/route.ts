@@ -229,7 +229,7 @@ export async function POST(req: Request) {
     redirect: "follow",
   };
   const posts = await fetch(
-    `https://api16.unipile.com:14661/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
+    `https://api13.unipile.com:14336/api/v1/linkedin/search?limit=50&account_id=${account_id}`,
     requestOptions as RequestInit
   )
     .then((response) => {
