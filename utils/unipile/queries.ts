@@ -19,7 +19,7 @@ export async function getPostFromId(postId: string, unipileId: string) {
   };
 
   const post = await fetch(
-    "https://api13.unipile.com:14336/api/v1/posts/" +
+    "https://api14.unipile.com:14452/api/v1/posts/" +
       postId +
       "?account_id=" +
       unipileId,
@@ -44,7 +44,7 @@ export async function getProviderId(unipile_id: string, public_id?: string) {
     redirect: "follow",
   };
   const provider_id = await fetch(
-    `https://api13.unipile.com:14336/api/v1/users/${
+    `https://api14.unipile.com:14452/api/v1/users/${
       public_id ?? "me"
     }?account_id=${unipile_id}`,
     requestOptions as RequestInit
@@ -69,7 +69,7 @@ export async function getUserComments(unipileId: string, provider_id: string) {
   };
 
   const comments = await fetch(
-    `https://api13.unipile.com:14336/api/v1/users/${provider_id}/comments?limit=100&account_id=${unipileId}`,
+    `https://api14.unipile.com:14452/api/v1/users/${provider_id}/comments?limit=100&account_id=${unipileId}`,
     comRequestOptions as RequestInit
   )
     .then((response) => response.json())
@@ -89,7 +89,7 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
   };
 
   const response = await fetch(
-    "https://api13.unipile.com:14336/api/v1/users/" +
+    "https://api14.unipile.com:14452/api/v1/users/" +
       provider_id +
       "?account_id=" +
       unipileId,
@@ -123,7 +123,7 @@ export async function getProfilDesc(unipileId: string, provider_id: string) {
 //   };
 
 //   const response = await fetch(
-//     "https://api13.unipile.com:14336/api/v1/accounts",
+//     "https://api14.unipile.com:14452/api/v1/accounts",
 //     requestOptions as RequestInit
 //   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
 //   await new Promise((resolve) => setTimeout(resolve, 7000));
@@ -208,7 +208,7 @@ export const getUnipileConnectUrl = async (
           type: "create",
           providers: "*",
           expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-          api_url: "https://api13.unipile.com:14336",
+          api_url: "https://api14.unipile.com:14452",
           success_redirect_url: success_url,
           failure_redirect_url: failure_url,
           notify_url: "https://auto-commenter.vercel.app/api/unipile/",
@@ -218,7 +218,7 @@ export const getUnipileConnectUrl = async (
           type: "reconnect",
           providers: "*",
           expiresOn: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
-          api_url: "https://api13.unipile.com:14336",
+          api_url: "https://api14.unipile.com:14452",
           reconnect_account: id,
           success_redirect_url: success_url,
           failure_redirect_url: failure_url,
@@ -234,7 +234,7 @@ export const getUnipileConnectUrl = async (
   };
 
   const result = await fetch(
-    "https://api13.unipile.com:14336/api/v1/hosted/accounts/link",
+    "https://api14.unipile.com:14452/api/v1/hosted/accounts/link",
     requestOptions as RequestInit
   )
     .then(async (response) => await response.json())
@@ -271,7 +271,7 @@ export async function postComment(
   // await waitRandomTime();
   console.log("comment close to posting..");
   const res = await fetch(
-    "https://api13.unipile.com:14336/api/v1/posts/" +
+    "https://api14.unipile.com:14452/api/v1/posts/" +
       post_id.replaceAll(":", "%3A") +
       "/comments",
     requestOptions as RequestInit
@@ -305,7 +305,7 @@ export async function fuckUnipile(
     redirect: "follow",
   };
   const response = await fetch(
-    "https://api13.unipile.com:14336/api/v1/accounts",
+    "https://api14.unipile.com:14452/api/v1/accounts",
     requestOptions as RequestInit
   ).catch((error) => redirect(getErrorRedirect("/dashboard", error.message)));
   await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -359,7 +359,7 @@ export async function getUserPosts(public_ids: string[], unipile_id: string) {
     };
 
     const response = await fetch(
-      "https://api13.unipile.com:14336/api/v1/users/" +
+      "https://api14.unipile.com:14452/api/v1/users/" +
         public_id +
         "?account_id=" +
         unipile_id,
@@ -370,7 +370,7 @@ export async function getUserPosts(public_ids: string[], unipile_id: string) {
     console.log(response);
 
     const response2 = await fetch(
-      "https://api13.unipile.com:14336/api/v1/users/" +
+      "https://api14.unipile.com:14452/api/v1/users/" +
         response.provider_id +
         "/posts?limit=1&account_id=" +
         unipile_id,

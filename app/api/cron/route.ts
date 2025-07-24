@@ -48,7 +48,7 @@ export async function GET(req: Request) {
   // };
 
   // const accounts = await fetch(
-  //   "https://api13.unipile.com:14336/api/v1/accounts",
+  //   "https://api14.unipile.com:14452/api/v1/accounts",
   //   requestOptions as RequestInit
   // )
   //   .then((response) => {
